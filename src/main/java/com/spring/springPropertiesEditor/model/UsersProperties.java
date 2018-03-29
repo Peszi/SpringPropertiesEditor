@@ -3,6 +3,7 @@ package com.spring.springPropertiesEditor.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
@@ -35,6 +36,8 @@ public class UsersProperties {
     }
 
     public void reloadUsers() {
+//        ReloadableResourceBundleMessageSource rs = Global.getBean("messageSource", ReloadableResourceBundleMessageSource.class);
+//        rs.clearCache();
         Map<String, Object> map = new HashMap();
         for(Iterator it = ((AbstractEnvironment) this.environment).getPropertySources().iterator(); it.hasNext(); ) {
             PropertySource propertySource = (PropertySource) it.next();
