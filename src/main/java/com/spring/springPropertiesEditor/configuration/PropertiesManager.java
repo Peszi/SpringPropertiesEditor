@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DefaultPropertiesPersister;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -39,14 +40,34 @@ public class PropertiesManager {
 
     @PostConstruct
     public void init() {
-        this.readPropertiesFromFile();
+        this.loadPropertiesFile();
+
+//        this.textWriteYaml(this.file_path);
     }
+
+//    private void textWriteYaml(String filePath) {
+//        Property property = new Property();
+//        property.setKey("key");
+//        property.setValue(123);
+//        try {
+//            FileOutputStream fileOutputStream = new FileOutputStream(new File(filePath + FILE_YAML_EXT));
+//            new ObjectMapper(new YAMLFactory()).writeValue(fileOutputStream, property);
+//            fileOutputStream.flush();
+//            fileOutputStream.close();
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public Properties getProperties() {
         return properties;
     }
 
-    public TreeMap<String, String> printProperties() {
+    public TreeMap<String, String> getPropertiesList() {
         TreeMap<String, String> propertiesMap = new TreeMap<>();
         Enumeration<String> propertyNamesArray = (Enumeration<String>) this.properties.propertyNames();
         while(propertyNamesArray.hasMoreElements()) {
@@ -56,24 +77,45 @@ public class PropertiesManager {
         return propertiesMap;
     }
 
-    public void setProperty(String key, String value) {
-        logger.info("setProperty " + key + " = " + value);
+    public void addProperty(String key, String value) {
+        logger.info("Adding property: " + key + "###" + value);
         this.properties.setProperty(key, value);
     }
 
-    public void readPropertiesFromFile() { // TODO TMP
-        logger.info("LOAD PATH " + this.file_path + FILE_PROPERTIES_EXT);
-        this.readPropertiesFromFile(getClass().getClassLoader().getResource(PROPERTIES_PATH + FILE_PROPERTIES_EXT).getFile());
+    public boolean editProperty(String key, String newValue) {
+        final String oldValue = this.properties.getProperty(key);
+        logger.info("Editing property: " + key + "###" + oldValue + " TO " + newValue);
+        return this.properties.replace(key, oldValue, newValue);
     }
 
-    private void readPropertiesFromFile(String filePath) {
+    public boolean removeProperty(String key, String value) {
+        logger.info("Removing property: " + key + "###" + value);
+        return this.properties.remove(key, value);
+    }
+
+    public boolean isPropertyKeyIn(String key) {
+        return (this.properties.containsKey(key) ? true : false);
+    }
+
+    public void loadPropertiesFile() { // TODO TMP
+        logger.info("LOAD PATH " + this.file_path + FILE_PROPERTIES_EXT);
+//        this.loadPropertiesFile(new File(getClass().getClassLoader().getResource(PROPERTIES_PATH + FILE_PROPERTIES_EXT).getFile()));
+    }
+
+    public boolean loadPropertiesFile(MultipartFile multipartFile) {
         try {
-            FileInputStream fileInputStream = new FileInputStream(new File(filePath));
-            this.defaultPropertiesPersister.load(this.properties, fileInputStream);
-            fileInputStream.close();
+            if (this.checkExtension(multipartFile.getOriginalFilename())) {
+                this.properties.load(multipartFile.getInputStream());
+                return true;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return false;
+    }
+
+    private boolean checkExtension(String fullPath) {
+        return (fullPath.endsWith(".properties") ? true : false);
     }
 
     public void savePropertiesAsProperties() { // TODO TMP
@@ -92,11 +134,10 @@ public class PropertiesManager {
         }
     }
 
-    public void savePropertiesAsJson(String filePath) {
+    private void savePropertiesAsJson(String filePath) {
         try {
-            final String jsonProperties = new ObjectMapper().writeValueAsString(this.properties);
             FileOutputStream fileOutputStream = new FileOutputStream(new File(filePath + FILE_JSON_EXT));
-            fileOutputStream.write(jsonProperties.getBytes());
+            fileOutputStream.write(new ObjectMapper().writeValueAsString(this.properties).getBytes());
             fileOutputStream.flush();
             fileOutputStream.close();
         } catch (JsonProcessingException e) {
@@ -108,7 +149,7 @@ public class PropertiesManager {
         }
     }
 
-    public void savePropertiesAsYaml(String filePath) {
+    private void savePropertiesAsYaml(String filePath) {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(new File(filePath + FILE_YAML_EXT));
             new ObjectMapper(new YAMLFactory()).writeValue(fileOutputStream, this.properties);
