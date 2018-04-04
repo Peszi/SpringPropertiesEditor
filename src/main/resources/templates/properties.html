@@ -7,66 +7,101 @@
 </head>
 <body>
 <div id="mainContainer">
-    <h1>Properties Editor</h1>
-
-    <form id="propRemove" action="#" th:action="@{/remove}" th:object="${property}" method="post" hidden>
-        <input type="text" th:field="*{key}" />
-        <input type="text" th:field="*{value}"/>
-        <input type="submit" value="submit" />
-    </form>
-    <form action="#" th:action="@{/properties}" th:object="${property}" method="post">
-        <input type="submit" value="Change" hidden />
+    <!--<div class="flexy">
+        <div class="container halfContainer left">
+            <h1>Upload Properties</h1>
+            <form action="#" th:action="@{/upload}" method="post" enctype="multipart/form-data">
+                <input class="picker" type="file" name="file" accept=".properties" required />
+                <input class="button" type="submit" value="Upload" />
+            </form>
+        </div>
+        <div class="container halfContainer">
+            <h1>Download Properties</h1>
+            <form action="./download">
+                <input class="button" type="submit" value="Download .properties"/>
+            </form>
+        </div>
+    </div>-->
+    <div class="container">
+        <h1>Upload Properties</h1>
+        <form action="#" th:action="@{/upload}" method="post" enctype="multipart/form-data">
+            <input class="picker" type="file" name="file" accept=".properties" required />
+            <input class="button" type="submit" value="Upload" />
+        </form>
+    </div>
+    <div class="container">
+        <h1>Properties Editor</h1>
+        <form id="propEdit" action="#" th:action="@{/properties}" th:object="${property}" method="post">
+            <input type="submit" value="Change" hidden />
+            <table>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+                <tr id="propInput">
+                    <td class="key"><input class="list" type="text" placeholder="add a new property" th:field="*{key}" /></td>
+                    <td class="value"><input class="list" type="text" placeholder="change value" th:field="*{value}" /></td>
+                    <td><a th:href="@{/clear}"><img class="imgBtn" src="ic_close.png"/></a></td>
+                </tr>
+                <tr class="prop" th:each="prop : ${properties}">
+                    <td class="key"><a th:href="@{/properties(key=${prop.key})}" th:text="${prop.key}">Empty List</a></td>
+                    <td class="value"><a th:href="@{/properties(key=${prop.key})}" th:text="${prop.value}">No Value</a></td>
+                    <td><a th:href="@{/remove(key=${prop.key}, value=${prop.value})}"><img class="imgBtn" src="ic_delete.png"/></a></td>
+                </tr>
+            </table>
+        </form>
+        <form class="someMargin" action="./download">
+            <input class="button" type="submit" value="Download .properties"/>
+        </form>
+    </div>
+    <div class="container">
+        <h1>Change Logger</h1>
         <table>
             <tr>
-                <th>Key</th>
-                <th>Value</th>
+                <th>Change</th>
+                <th>Timestamp</th>
             </tr>
-            <tr id="propInput">
-                <td><input class="list" type="text" placeholder="add a new property" th:field="*{key}" onkeypress="onTypeKeyword(this)" /></td>
-                <td><input class="list" type="text" placeholder="value" th:field="*{value}" /></td>
-            </tr>
-            <tr class="prop" th:each="prop : ${properties}">
-                <td class="key" th:text="${prop.key}" onclick="setupInput(this)"></td>
-                <td class="value" th:text="${prop.value}" onclick="setupInput(this)"></td>
-                <td onclick="removeProperty(this)">remove</td>
+            <tr class="prop" th:each="log : ${changes}">
+                <td class="key" th:text="${log.message}"></td>
+                <td th:text="${log.created}"></td>
             </tr>
         </table>
-    </form>
-    <li id="tips"></li>
+        <div class="flexy">
+            <div class="halfContainer left">
+                <form class="someMargin" action="./download">
+                    <input class="button" type="submit" value="Export .json"/>
+                </form>
+            </div>
+            <div class="halfContainer">
+                <form class="someMargin" action="./download">
+                    <input class="button" type="submit" value="Export .yaml"/>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="bottomBar"></div>
 </div>
 <script>
-    function removeProperty(element) {
-        var removeForm = document.getElementById("propRemove");
-        removeForm.children[0].value = element.parentElement.children[0].textContent;
-        removeForm.children[1].value = element.parentElement.children[1].textContent;
-        removeForm.submit();
-    }
-    function setupInput(element) {
-        var propInput = document.getElementById("propInput");
-        propInput.children[0].firstChild.value = element.parentElement.children[0].textContent;
-        propInput.children[1].firstChild.value = element.parentElement.children[1].textContent;
-    }
-    function onTypeKeyword(keyword) {
-        var tipsList = document.getElementById("tips");
-        while (tipsList.firstChild) {
-            tipsList.removeChild(tipsList.firstChild);
-        }
-        if (keyword.value.length > 0) {
-            var propsElements = document.getElementsByClassName("prop");
-            for(var i = 0; i < propsElements.length; i++) {
-                var entryKey = propsElements[i].childNodes[1].textContent;
-                if (entryKey.startsWith(keyword.value) && i <= 4) {
-                    var li = document.createElement("li");
-                    li.appendChild(document.createTextNode(entryKey));
-                    tipsList.appendChild(li);
-                }
+    var inputKey = document.getElementById("propInput").children[0].firstChild;
+    inputKey.addEventListener('input', function() {
+        highlightSameProperty();
+    });
+    highlightSameProperty();
+    function highlightSameProperty() {
+        var propsElements = document.getElementsByClassName("prop");
+        for(var i = 0; i < propsElements.length; i++) {
+            var childKey = propsElements[i].childNodes[1].textContent;
+            var backColor = "#fff";
+            if (inputKey.value == childKey) {
+                backColor = "#beb";
             }
+            propsElements[i].style.backgroundColor = backColor;
         }
     }
 </script>
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var message = /*[[${message}]]*/ 'default';
+    var message = /*[[${message}]]*/ null;
     if (!!message) {
         alert(message);
     }

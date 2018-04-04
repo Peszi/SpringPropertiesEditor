@@ -1,4 +1,5 @@
 body {
+    font-family: Verdana,Geneva,sans-serif;
     background-color: #efefef;
 }
 
@@ -6,49 +7,108 @@ h1 {
     margin-top: 0;
     text-align: center;
     vertical-align: middle;
+    font-size: large;
 }
 
 #mainContainer {
     position: absolute;
-    padding: 40px;
-
+    margin-top: 100px;
+    margin-bottom: 100px;
+    padding: 0;
     position: absolute;
+    top: 0;
     left: 50%;
-    top: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+}
 
+.container {
+    margin-bottom: 10px;
+    padding: 20px;
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0px 0px 4px #666;
 }
 
-#mainContainerSmall {
-    position: absolute;
-    padding: 40px;
+.small {
+    width: 50%;
+}
 
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+.flexy {
+    display: flex;
+    margin: 0;
+    margin-bottom: 10px;
+}
 
-    background-color: #fff;
+.halfContainer {
+    flex: 1;
+    margin: 0;
+}
+
+.left {
+    margin-right: 10px;
+}
+
+.picker {
+    width: auto;
+    margin: 4px;
+    padding: 8px;
+}
+
+.button {
+    width: 100%;
+    margin: 2px;
+    padding: 8px;
+    background-color: #ddd;
     border-radius: 10px;
     box-shadow: 0px 0px 4px #666;
+    font-size: medium;
+}
+
+.someMargin {
+    margin-top: 10px;
 }
 
 .list {
     width: 100%;
     border-style: none;
+    border-radius: 2px;
+}
+
+tr {
+    margin: 5px;
+    padding: 5px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th {
+    font-size: small;
 }
 
 td {
+    margin: 0;
+    padding: 4px;
     width: 100%;
-    padding: 6px;
-    border-style: solid;
-    border-radius: 2px;
-    border-width: 1px;
+    font-size: small;
+    overflow:hidden;
+    white-space:nowrap;
+}
+
+td a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+.prop {
+    border-top: 1px solid #999;
+}
+
+.key, .value {
+    min-width: 100px;
+    border-right: 1px solid #aaa;
 }
 
 li {
@@ -57,4 +117,25 @@ li {
 
 ul {
     list-style-type: none;
+}
+
+input {
+    margin: 0;
+    padding: 0;
+    font-size: small;
+}
+
+#propInput {
+    border: 2px solid #999;
+}
+
+.imgBtn {
+    margin: 0;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.bottomBar {
+    margin: 100px;
 }

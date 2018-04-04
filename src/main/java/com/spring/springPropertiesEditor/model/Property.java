@@ -6,11 +6,16 @@ import javax.validation.constraints.NotNull;
 public class Property {
 
     @NotNull
-    @NotEmpty
     private String key;
     @NotNull
-    @NotEmpty
     private String value;
+
+    public Property() {}
+
+    public Property(@NotNull String key, @NotNull String value) {
+        this.key = key;
+        this.value = value;
+    }
 
     public String getKey() {
         return key;

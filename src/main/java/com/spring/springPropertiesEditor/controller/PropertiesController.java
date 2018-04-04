@@ -1,60 +1,70 @@
 package com.spring.springPropertiesEditor.controller;
 
-import com.spring.springPropertiesEditor.configuration.PropertiesManager;
+import com.spring.springPropertiesEditor.respository.ChangeLogRepository;
+import com.spring.springPropertiesEditor.service.PropertiesManager;
 import com.spring.springPropertiesEditor.model.Property;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotNull;
 
 @Controller
+@ControllerAdvice
 public class PropertiesController {
 
     private PropertiesManager propertiesManager;
+    private ChangeLogRepository changeLogRepository;
 
-    public PropertiesController(PropertiesManager propertiesManager) {
+    public PropertiesController(PropertiesManager propertiesManager, ChangeLogRepository changeLogRepository) {
         this.propertiesManager = propertiesManager;
+        this.changeLogRepository = changeLogRepository;
     }
 
     @GetMapping("/properties")
-    String getProperties(Model model) {
-        model.addAttribute("property",  new Property());
-        model.addAttribute("properties",  this.propertiesManager.getPropertiesList());
+    String getProperties(@RequestParam(value = "key", required = false) String key, Model model) {
+        this.setupModel(model, this.getProperty(key));
         return "properties";
     }
 
     @PostMapping("/properties")
     public String changeProperty(@ModelAttribute("property") Property property, Model model, BindingResult binding) {
         if (!binding.hasErrors()) {
-            System.out.println("K " + property.getKey() + " V " + property.getValue());
-            if (this.propertiesManager.isPropertyKeyIn(property.getKey())) {
+            if (this.propertiesManager.hasKey(property.getKey())) {
                 this.propertiesManager.editProperty(property.getKey(), property.getValue());
                 property.cleanUp();
-                model.addAttribute("properties",  this.propertiesManager.getPropertiesList());
-                model.addAttribute("message", "property changed!");
-                return "properties";
+            } else {
+                this.propertiesManager.addProperty(property.getKey(), property.getValue());
+                property.cleanUp();
             }
-            this.propertiesManager.addProperty(property.getKey(), property.getValue());
-            property.cleanUp();
-            model.addAttribute("properties",  this.propertiesManager.getPropertiesList());
-            model.addAttribute("message", "property added!");
-            return "properties";
+        } else {
+            model.addAttribute("message", "cannot change entry!");
         }
-        model.addAttribute("properties",  this.propertiesManager.getPropertiesList());
-        model.addAttribute("message", "cannot change entry!");
+        this.setupModel(model, property);
         return "properties";
     }
 
-    @PostMapping("/remove")
-    public String removeProperty(@ModelAttribute("property") Property property, Model model, BindingResult binding) {
-        System.out.println("K " + property.getKey() + " V " + property.getValue());
-        if (this.propertiesManager.removeProperty(property.getKey(), property.getValue())) {
-            model.addAttribute("message", "removed property!");
-        }
-        model.addAttribute("properties",  this.propertiesManager.getPropertiesList());
+    @GetMapping("/remove")
+    public String removeProperty(@RequestParam(value = "key", required = true) @NotNull String key, @RequestParam(value = "value", required = true) @NotNull String value, Model model) {
+        this.propertiesManager.removeProperty(key, value);
+        this.setupModel(model, new Property());
         return "properties";
+    }
+
+    @GetMapping("/clear")
+    public String clearInputs(Model model) {
+        this.setupModel(model, new Property());
+        return "properties";
+    }
+
+    private void setupModel(Model model, Property inputProperty) {
+        model.addAttribute("property", inputProperty);
+        model.addAttribute("properties", this.propertiesManager.getSortedPropertiesList());
+        model.addAttribute("changes", this.changeLogRepository.findAll());
+    }
+
+    private Property getProperty(String key) {
+        return (key != null) ? new Property(key, this.propertiesManager.getProperties().getProperty(key)) : new Property();
     }
 }
