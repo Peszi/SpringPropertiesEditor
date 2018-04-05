@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="AUDIT_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${logging.path}/Audit.log</file>
+        <encoder>
+            <pattern>%d %magenta([%thread]) %highlight(%-5level) %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="APPLICATION_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${logging.path}/Application.log</file>
+        <encoder>
+            <pattern>%d %magenta([%thread]) %highlight(%-5level) %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d %magenta([%thread]) %highlight(%-5level) %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.spring.springPropertiesEditor.logger.AuditLogger" level="INFO" additivity="false">
+        <appender-ref ref="AUDIT_FILE" />
+    </logger>
+
+    <root level="INFO" additivity="false">
+        <appender-ref ref="APPLICATION_FILE" />
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>

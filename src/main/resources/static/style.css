@@ -97,16 +97,23 @@ td {
     white-space:nowrap;
 }
 
+.none {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
 td a {
     color: inherit;
     text-decoration: inherit;
 }
 
-.prop {
+.propList {
     border-top: 1px solid #999;
 }
 
-.key, .value {
+.entry {
     min-width: 100px;
     border-right: 1px solid #aaa;
 }

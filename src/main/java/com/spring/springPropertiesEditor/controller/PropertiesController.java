@@ -1,6 +1,5 @@
 package com.spring.springPropertiesEditor.controller;
 
-import com.spring.springPropertiesEditor.respository.ChangeLogRepository;
 import com.spring.springPropertiesEditor.service.PropertiesManager;
 import com.spring.springPropertiesEditor.model.Property;
 import org.springframework.stereotype.Controller;
@@ -9,28 +8,33 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Controller
 @ControllerAdvice
 public class PropertiesController {
 
     private PropertiesManager propertiesManager;
-    private ChangeLogRepository changeLogRepository;
 
-    public PropertiesController(PropertiesManager propertiesManager, ChangeLogRepository changeLogRepository) {
+    public PropertiesController(PropertiesManager propertiesManager) {
         this.propertiesManager = propertiesManager;
-        this.changeLogRepository = changeLogRepository;
+    }
+
+    @GetMapping("/")
+    String redirect() {
+        return "redirect:/properties";
     }
 
     @GetMapping("/properties")
-    String getProperties(@RequestParam(value = "key", required = false) String key, Model model) {
-        this.setupModel(model, this.getProperty(key));
+    String getProperties(@RequestParam(required = false) String key, @RequestParam(required = false) @NotNull String message, Model model) {
+        this.setupModel(model, (this.propertiesManager.isLoaded()) ? this.getProperty(key) : new Property());
+        model.addAttribute("message", message);
         return "properties";
     }
 
     @PostMapping("/properties")
-    public String changeProperty(@ModelAttribute("property") Property property, Model model, BindingResult binding) {
-        if (!binding.hasErrors()) {
+    public String changeProperty(@ModelAttribute("property") Property property, BindingResult binding, Model model) {
+        if (!binding.hasErrors() && property.getKey().length() > 0) {
             if (this.propertiesManager.hasKey(property.getKey())) {
                 this.propertiesManager.editProperty(property.getKey(), property.getValue());
                 property.cleanUp();
@@ -45,23 +49,22 @@ public class PropertiesController {
         return "properties";
     }
 
-    @GetMapping("/remove")
-    public String removeProperty(@RequestParam(value = "key", required = true) @NotNull String key, @RequestParam(value = "value", required = true) @NotNull String value, Model model) {
-        this.propertiesManager.removeProperty(key, value);
+    @PostMapping("/delete")
+    public String removeProperty(@RequestParam Map<String,String> propertyParams, Model model) {
+        if (propertyParams.size() == 1) {
+            final Map.Entry<String,String> property = propertyParams.entrySet().iterator().next();
+            this.propertiesManager.removeProperty(property.getKey(), property.getValue());
+        } else {
+            model.addAttribute("message", "cannot remove entry!");
+        }
         this.setupModel(model, new Property());
         return "properties";
     }
 
-    @GetMapping("/clear")
-    public String clearInputs(Model model) {
-        this.setupModel(model, new Property());
-        return "properties";
-    }
-
-    private void setupModel(Model model, Property inputProperty) {
+    @ModelAttribute
+    public void setupModel(Model model, Property inputProperty) {
         model.addAttribute("property", inputProperty);
         model.addAttribute("properties", this.propertiesManager.getSortedPropertiesList());
-        model.addAttribute("changes", this.changeLogRepository.findAll());
     }
 
     private Property getProperty(String key) {

@@ -7,73 +7,63 @@
 </head>
 <body>
 <div id="mainContainer">
-    <!--<div class="flexy">
-        <div class="container halfContainer left">
-            <h1>Upload Properties</h1>
-            <form action="#" th:action="@{/upload}" method="post" enctype="multipart/form-data">
-                <input class="picker" type="file" name="file" accept=".properties" required />
-                <input class="button" type="submit" value="Upload" />
-            </form>
-        </div>
-        <div class="container halfContainer">
-            <h1>Download Properties</h1>
-            <form action="./download">
-                <input class="button" type="submit" value="Download .properties"/>
-            </form>
-        </div>
-    </div>-->
     <div class="container">
         <h1>Upload Properties</h1>
-        <form action="#" th:action="@{/upload}" method="post" enctype="multipart/form-data">
+        <form action="./properties/upload" method="post" enctype="multipart/form-data">
             <input class="picker" type="file" name="file" accept=".properties" required />
             <input class="button" type="submit" value="Upload" />
         </form>
     </div>
     <div class="container">
         <h1>Properties Editor</h1>
-        <form id="propEdit" action="#" th:action="@{/properties}" th:object="${property}" method="post">
-            <input type="submit" value="Change" hidden />
-            <table>
-                <tr>
-                    <th>Key</th>
-                    <th>Value</th>
-                </tr>
+        <table>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+            </tr>
+            <!--/*@thymesVar id="property" type="com.spring.springPropertiesEditor.model.Property"*/-->
+            <form id="propEdit" action="#" th:action="@{/properties}" th:object="${property}" method="post">
                 <tr id="propInput">
-                    <td class="key"><input class="list" type="text" placeholder="add a new property" th:field="*{key}" /></td>
-                    <td class="value"><input class="list" type="text" placeholder="change value" th:field="*{value}" /></td>
-                    <td><a th:href="@{/clear}"><img class="imgBtn" src="ic_close.png"/></a></td>
+                    <td class="entry"><input class="list" type="text" th:field="*{key}" placeholder="add a new property" /></td>
+                    <td class="entry"><input class="list" type="text" th:field="*{value}" placeholder="change value" /></td>
+                    <td><a href="/properties"><img class="imgBtn" src="ic_close.png"/></a></td> <!-- -->
+                    <input type="submit" hidden/>
                 </tr>
-                <tr class="prop" th:each="prop : ${properties}">
-                    <td class="key"><a th:href="@{/properties(key=${prop.key})}" th:text="${prop.key}">Empty List</a></td>
-                    <td class="value"><a th:href="@{/properties(key=${prop.key})}" th:text="${prop.value}">No Value</a></td>
-                    <td><a th:href="@{/remove(key=${prop.key}, value=${prop.value})}"><img class="imgBtn" src="ic_delete.png"/></a></td>
+            </form>
+            <form action="#" th:action="@{/delete}" method="post">
+                <!--/*@thymesVar id="properties" type="java.util.Map<String, String>"*/-->
+                <tr class="propList" th:each="prop : ${properties}">
+                    <td class="entry"><a th:href="@{/properties(key=${prop.key})}" th:text="${prop.key}">Empty List</a></td>
+                    <td class="entry"><a th:href="@{/properties(key=${prop.key})}" th:text="${prop.value}">No Value</a></td>
+                    <td><button class="none" type="submit" th:name="${prop.key}" th:value="${prop.value}" ><img class="imgBtn" src="ic_delete.png" /></button></td>
                 </tr>
-            </table>
-        </form>
-        <form class="someMargin" action="./download">
+            </form>
+        </table>
+        <form class="someMargin" action="./properties/download">
             <input class="button" type="submit" value="Download .properties"/>
         </form>
     </div>
     <div class="container">
         <h1>Change Logger</h1>
-        <table>
+        <!--/*@thymesVar id="changes" type="java.lang.Iterable<com.spring.springPropertiesEditor.model.Log>"*/-->
+        <table th:if="${not #lists.isEmpty(changes)}">
             <tr>
                 <th>Change</th>
                 <th>Timestamp</th>
             </tr>
-            <tr class="prop" th:each="log : ${changes}">
-                <td class="key" th:text="${log.message}"></td>
+            <tr class="propList" th:each="log : ${changes}">
+                <td class="entry" th:text="${log.message}"></td>
                 <td th:text="${log.created}"></td>
             </tr>
         </table>
         <div class="flexy">
             <div class="halfContainer left">
-                <form class="someMargin" action="./download">
+                <form class="someMargin" action="./changes/json">
                     <input class="button" type="submit" value="Export .json"/>
                 </form>
             </div>
             <div class="halfContainer">
-                <form class="someMargin" action="./download">
+                <form class="someMargin" action="./changes/yaml">
                     <input class="button" type="submit" value="Export .yaml"/>
                 </form>
             </div>
@@ -88,7 +78,7 @@
     });
     highlightSameProperty();
     function highlightSameProperty() {
-        var propsElements = document.getElementsByClassName("prop");
+        var propsElements = document.getElementsByClassName("propList");
         for(var i = 0; i < propsElements.length; i++) {
             var childKey = propsElements[i].childNodes[1].textContent;
             var backColor = "#fff";
