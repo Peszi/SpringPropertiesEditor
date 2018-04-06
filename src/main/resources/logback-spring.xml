@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <property name="LOG_PATH" value="${LOG_PATH:-.}"/>
     <appender name="AUDIT_FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${logging.path}/Audit.log</file>
+        <file>${LOG_PATH}/Audit.log</file>
+        <param name="Append" value="false" />
         <encoder>
-            <pattern>%d %magenta([%thread]) %highlight(%-5level) %logger{36} - %msg%n</pattern>
+            <pattern>%d %msg%n</pattern>
         </encoder>
     </appender>
     <appender name="APPLICATION_FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${logging.path}/Application.log</file>
+        <file>${LOG_PATH}/Application.log</file>
+        <param name="Append" value="false" />
         <encoder>
-            <pattern>%d %magenta([%thread]) %highlight(%-5level) %logger{36} - %msg%n</pattern>
+            <pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -18,10 +21,9 @@
         </encoder>
     </appender>
 
-    <logger name="com.spring.springPropertiesEditor.logger.AuditLogger" level="INFO" additivity="false">
+    <logger name="com.spring.springPropertiesEditor.service.AuditLoggerService" level="INFO" additivity="false">
         <appender-ref ref="AUDIT_FILE" />
     </logger>
-
     <root level="INFO" additivity="false">
         <appender-ref ref="APPLICATION_FILE" />
         <appender-ref ref="CONSOLE" />

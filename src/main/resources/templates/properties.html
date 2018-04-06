@@ -6,12 +6,14 @@
     <link href="../static/style.css" th:href="@{/style.css}" rel="stylesheet" />
 </head>
 <body>
-<div id="mainContainer">
+<div class="mainContainer">
     <div class="container">
         <h1>Upload Properties</h1>
         <form action="./properties/upload" method="post" enctype="multipart/form-data">
-            <input class="picker" type="file" name="file" accept=".properties" required />
-            <input class="button" type="submit" value="Upload" />
+            <div class="flexyContainer">
+                <input class="fileInput rightMargin" type="file" name="file" accept=".properties" required />
+                <input class="simpleButton small" type="submit" value="Upload" />
+            </div>
         </form>
     </div>
     <div class="container">
@@ -23,53 +25,54 @@
             </tr>
             <!--/*@thymesVar id="property" type="com.spring.springPropertiesEditor.model.Property"*/-->
             <form id="propEdit" action="#" th:action="@{/properties}" th:object="${property}" method="post">
-                <tr id="propInput">
-                    <td class="entry"><input class="list" type="text" th:field="*{key}" placeholder="add a new property" /></td>
-                    <td class="entry"><input class="list" type="text" th:field="*{value}" placeholder="change value" /></td>
-                    <td><a href="/properties"><img class="imgBtn" src="ic_close.png"/></a></td> <!-- -->
+                <tr class="littleBorder" id="propInput" >
+                    <td class="entry"><input class="simpleInput" type="text" th:field="*{key}" placeholder="add a new property" /></td>
+                    <td class="entry"><input class="simpleInput" type="text" th:field="*{value}" placeholder="value" /></td>
+                    <td class="minObject"><a href="/properties"><img class="imageButton" src="ic_close.png"/></a></td> <!-- -->
                     <input type="submit" hidden/>
                 </tr>
             </form>
             <form action="#" th:action="@{/delete}" method="post">
                 <!--/*@thymesVar id="properties" type="java.util.Map<String, String>"*/-->
-                <tr class="propList" th:each="prop : ${properties}">
+                <tr class="topBorder" th:each="prop : ${properties}">
                     <td class="entry"><a th:href="@{/properties(key=${prop.key})}" th:text="${prop.key}">Empty List</a></td>
                     <td class="entry"><a th:href="@{/properties(key=${prop.key})}" th:text="${prop.value}">No Value</a></td>
-                    <td><button class="none" type="submit" th:name="${prop.key}" th:value="${prop.value}" ><img class="imgBtn" src="ic_delete.png" /></button></td>
+                    <td class="minObject"><button class="none" type="submit" th:name="${prop.key}" th:value="${prop.value}" ><img class="imageButton" src="ic_delete.png" /></button></td>
                 </tr>
             </form>
         </table>
-        <form class="someMargin" action="./properties/download">
-            <input class="button" type="submit" value="Download .properties"/>
-        </form>
+        <div class="flexyContainer">
+            <form class="flexyChild rightMargin" action="./properties/download">
+                <input class="simpleButton" type="submit" value="Download .properties"/>
+            </form>
+            <form class="flexyChild rightMargin" action="./properties/download/json">
+                <input class="simpleButton" type="submit" value="Download .json"/>
+            </form>
+            <form class="flexyChild" action="./properties/download/yaml">
+                <input class="simpleButton" type="submit" value="Download .yaml"/>
+            </form>
+        </div>
     </div>
     <div class="container">
         <h1>Change Logger</h1>
-        <!--/*@thymesVar id="changes" type="java.lang.Iterable<com.spring.springPropertiesEditor.model.Log>"*/-->
-        <table th:if="${not #lists.isEmpty(changes)}">
-            <tr>
-                <th>Change</th>
-                <th>Timestamp</th>
-            </tr>
-            <tr class="propList" th:each="log : ${changes}">
-                <td class="entry" th:text="${log.message}"></td>
-                <td th:text="${log.created}"></td>
-            </tr>
-        </table>
-        <div class="flexy">
-            <div class="halfContainer left">
-                <form class="someMargin" action="./changes/json">
-                    <input class="button" type="submit" value="Export .json"/>
+        <!--/*@thymesVar id="changes" type="java.util.List<String>"*/-->
+        <ul>
+            <li th:each="item : ${changes}" th:text="${item}">Log in here...</li>
+        </ul>
+        <div class="flexyContainer">
+            <div class="flexyChild rightMargin">
+                <form class="topMargin" action="./download/audit">
+                    <input class="simpleButton" type="submit" value="Export Audit.log"/>
                 </form>
             </div>
-            <div class="halfContainer">
-                <form class="someMargin" action="./changes/yaml">
-                    <input class="button" type="submit" value="Export .yaml"/>
+            <div class="flexyChild">
+                <form class="topMargin" action="./download/application">
+                    <input class="simpleButton" type="submit" value="Export Application.log"/>
                 </form>
             </div>
         </div>
     </div>
-    <div class="bottomBar"></div>
+    <div class="littleMargin"></div>
 </div>
 <script>
     var inputKey = document.getElementById("propInput").children[0].firstChild;
@@ -78,14 +81,31 @@
     });
     highlightSameProperty();
     function highlightSameProperty() {
-        var propsElements = document.getElementsByClassName("propList");
+        var propsElements = document.getElementsByClassName("topBorder");
+        var foundMatch = false;
         for(var i = 0; i < propsElements.length; i++) {
             var childKey = propsElements[i].childNodes[1].textContent;
             var backColor = "#fff";
-            if (inputKey.value == childKey) {
-                backColor = "#beb";
+            if (inputKey.value.length > 0 && childKey.indexOf(inputKey.value) == 0) {
+                if (inputKey.value == childKey) {
+                    backColor = "#beb";
+                    foundMatch = true;
+                } else {
+                    backColor = "#ebb";
+                }
             }
             propsElements[i].style.backgroundColor = backColor;
+        }
+        var inputKeyField = inputKey.parentElement;
+        var inputValueField = inputKey.parentElement.nextElementSibling;
+        if (foundMatch) {
+            inputKeyField.style.backgroundColor = "#beb";
+            inputValueField.style.backgroundColor = "#beb";
+            inputValueField.firstChild.placeholder = "change value";
+        } else {
+            inputKeyField.style.backgroundColor = "#fff";
+            inputValueField.style.backgroundColor = "#fff";
+            inputValueField.firstChild.placeholder = "add value";
         }
     }
 </script>
