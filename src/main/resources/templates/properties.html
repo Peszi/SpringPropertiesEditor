@@ -32,7 +32,7 @@
                     <input type="submit" hidden/>
                 </tr>
             </form>
-            <form action="#" th:action="@{/delete}" method="post">
+            <form action="#" th:action="@{/properties/delete}" method="post">
                 <!--/*@thymesVar id="properties" type="java.util.Map<String, String>"*/-->
                 <tr class="topBorder" th:each="prop : ${properties}">
                     <td class="entry"><a th:href="@{/properties(key=${prop.key})}" th:text="${prop.key}">Empty List</a></td>

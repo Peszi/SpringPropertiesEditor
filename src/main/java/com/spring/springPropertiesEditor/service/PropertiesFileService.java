@@ -3,12 +3,9 @@ package com.spring.springPropertiesEditor.service;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.spring.springPropertiesEditor.controller.PropertiesFileController;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -18,19 +15,19 @@ public class PropertiesFileService {
     public static final String FILE_JSON_EXT = ".json";
     public static final String FILE_YAML_EXT = ".yaml";
 
-    private PropertiesManagerService propertiesManagerService;
+    private ManagePropertiesServiceImpl managePropertiesServiceImpl;
 
     private String propertiesFileName;
 
-    public PropertiesFileService(PropertiesManagerService propertiesManagerService) {
-        this.propertiesManagerService = propertiesManagerService;
+    public PropertiesFileService(ManagePropertiesServiceImpl managePropertiesServiceImpl) {
+        this.managePropertiesServiceImpl = managePropertiesServiceImpl;
     }
 
     public boolean loadFile(MultipartFile multipartFile) {
         try {
             if (multipartFile != null && this.checkExtension(multipartFile.getOriginalFilename())) {
                 this.propertiesFileName = multipartFile.getOriginalFilename();
-                return this.propertiesManagerService.loadProperties(multipartFile.getInputStream());
+                return this.managePropertiesServiceImpl.loadProperties(multipartFile.getInputStream());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,12 +36,12 @@ public class PropertiesFileService {
     }
 
     public void getPropertiesStream(OutputStream outputStream) {
-        this.propertiesManagerService.saveProperties(outputStream);
+        this.managePropertiesServiceImpl.saveProperties(outputStream);
     }
 
     public boolean getJsonStream(OutputStream outputStream) {
         try {
-            new ObjectMapper(new JsonFactory()).writeValue(outputStream, this.propertiesManagerService.getProperties());
+            new ObjectMapper(new JsonFactory()).writeValue(outputStream, this.managePropertiesServiceImpl.getProperties());
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -54,7 +51,7 @@ public class PropertiesFileService {
 
     public boolean getYamlStream(OutputStream outputStream) {
         try {
-            new ObjectMapper(new YAMLFactory()).writeValue(outputStream, this.propertiesManagerService.getProperties());
+            new ObjectMapper(new YAMLFactory()).writeValue(outputStream, this.managePropertiesServiceImpl.getProperties());
             return true;
         } catch (IOException e) {
             e.printStackTrace();

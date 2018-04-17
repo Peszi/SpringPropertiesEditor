@@ -1,5 +1,6 @@
 package com.spring.springPropertiesEditor.service;
 
+import com.spring.springPropertiesEditor.model.Property;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -29,18 +30,18 @@ public class AuditLoggerService {
         this.loadAuditLog();
     }
 
-    public void logPropertyCreated(String key, String value) {
-        auditLogger.info(this.ADD_PREFIX + key + this.DATA_SEPARATOR + value);
+    public void logPropertyCreated(Property property) {
+        auditLogger.info(this.ADD_PREFIX + property.getKey() + this.DATA_SEPARATOR + property.getValue());
         this.loadAuditLog();
     }
 
-    public void logPropertyEdited(String key, String oldValue, String newValue) {
-        auditLogger.info(this.EDIT_PREFIX + key + this.DATA_SEPARATOR + oldValue + this.VALUE_SEPARATOR + newValue);
+    public void logPropertyEdited(Property property, String oldValue) {
+        auditLogger.info(this.EDIT_PREFIX + property.getKey() + this.DATA_SEPARATOR + oldValue + this.VALUE_SEPARATOR + property.getValue());
         this.loadAuditLog();
     }
 
-    public void logPropertyRemoved(String key, String value) {
-        auditLogger.info(this.REMOVE_PREFIX + key + this.DATA_SEPARATOR + value);
+    public void logPropertyRemoved(Property property) {
+        auditLogger.info(this.REMOVE_PREFIX + property.getKey() + this.DATA_SEPARATOR + property.getValue());
         this.loadAuditLog();
     }
 

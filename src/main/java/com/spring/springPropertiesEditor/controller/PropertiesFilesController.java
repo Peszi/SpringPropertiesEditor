@@ -14,13 +14,13 @@ import java.io.IOException;
 
 @Controller
 @RequestMapping("/properties")
-public class PropertiesFileController {
+public class PropertiesFilesController {
 
     private static final String FILE_FAIL_MESSAGE = "Properties are not loaded yet!";
 
     private PropertiesFileService fileService;
 
-    public PropertiesFileController(PropertiesFileService fileService) {
+    public PropertiesFilesController(PropertiesFileService fileService) {
         this.fileService = fileService;
     }
 
@@ -40,7 +40,7 @@ public class PropertiesFileController {
                 this.fileService.getPropertiesStream(response.getOutputStream());
                 response.flushBuffer();
             } else {
-                response.sendRedirect("/properties?message=" + PropertiesFileController.FILE_FAIL_MESSAGE);
+                response.sendRedirect("/properties?message=" + PropertiesFilesController.FILE_FAIL_MESSAGE);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -57,7 +57,7 @@ public class PropertiesFileController {
                 this.fileService.getJsonStream(response.getOutputStream());
                 response.flushBuffer();
             } else {
-                response.sendRedirect("/properties?message=" + PropertiesFileController.FILE_FAIL_MESSAGE);
+                response.sendRedirect("/properties?message=" + PropertiesFilesController.FILE_FAIL_MESSAGE);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,7 +73,7 @@ public class PropertiesFileController {
                 this.fileService.getYamlStream(response.getOutputStream());
                 response.flushBuffer();
             } else {
-                response.sendRedirect("/properties?message=" + PropertiesFileController.FILE_FAIL_MESSAGE);
+                response.sendRedirect("/properties?message=" + PropertiesFilesController.FILE_FAIL_MESSAGE);
             }
         } catch (IOException e) {
             e.printStackTrace();
