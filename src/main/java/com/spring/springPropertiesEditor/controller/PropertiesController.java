@@ -8,7 +8,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Controller
 @RequestMapping("/properties")
@@ -20,7 +22,7 @@ public class PropertiesController {
         this.managePropertiesService = managePropertiesService;
     }
 
-    @PostMapping()
+    @PostMapping
     public String changeOrAddProperty(@ModelAttribute Property property, BindingResult binding, Model model) {
         if (!binding.hasErrors()) {
             this.managePropertiesService.addOrChangeProperty(property);
@@ -32,17 +34,18 @@ public class PropertiesController {
         return "redirect:/properties";
     }
 
-    @GetMapping()
+    @GetMapping
     public String getProperties(@RequestParam(required = false) String key, @RequestParam(required = false) String message, Model model) {
-        this.setupModel(model, new Property()); // TODO
+        this.setupModel(model, this.managePropertiesService.getProperty(key)); // TODO
         model.addAttribute("message", message);
         return "properties";
     }
 
     @PostMapping("/delete")
-    public String removeProperty(@ModelAttribute Property property, BindingResult bindingResult, Model model) {
-        if (!bindingResult.hasErrors()) {
-            this.managePropertiesService.removeProperty(property);
+    public String removeProperty(@RequestParam Map<String, String> properties, Model model) {
+        if (properties != null && properties.size() == 1) {
+            final Map.Entry<String, String> property = properties.entrySet().iterator().next();
+            this.managePropertiesService.removeProperty(new Property(property.getKey(), property.getValue()));
         } else {
             model.addAttribute("message", "cannot remove entry!");
         }
@@ -54,12 +57,6 @@ public class PropertiesController {
     public void setupModel(Model model, Property inputProperty) {
         model.addAttribute("property", inputProperty);
         model.addAttribute("properties", this.managePropertiesService.getAllProperties());
-//        model.addAttribute("changes", this.managePropertiesServiceImpl.getAuditLogList());
+        model.addAttribute("changes", this.managePropertiesService.getAllAuditLogs());
     }
-
-//    private Property getProperty(String key) {
-//        if (this.managePropertiesServiceImpl.arePropertiesLoaded() || key != null)
-//            return new Property(key, this.managePropertiesServiceImpl.getProperties().getProperty(key));
-//        return new Property();
-//    }
 }

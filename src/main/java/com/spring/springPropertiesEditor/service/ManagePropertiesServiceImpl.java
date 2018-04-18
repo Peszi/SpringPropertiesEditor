@@ -43,15 +43,22 @@ public class ManagePropertiesServiceImpl implements ManagePropertiesService {
     }
 
     @Override
-    public Map<String, String> getAllProperties() {
-//        Map<String, String> propertiesMap = new HashMap<>();
-//        for (String key : new TreeSet<>(this.propertiesService.stringPropertyNames()).descendingSet())
-//            propertiesMap.put(key, this.properties.getProperty(key));
-//        return this.propertiesService;
-        return null;
+    public Property getProperty(String key) {
+        if (key != null && this.propertiesService.hasKey(key))
+            return new Property(key, this.propertiesService.getProperties().getProperty(key));
+        return new Property();
     }
 
-    public Object getAuditLogList() {
+    @Override
+    public Map<String, String> getAllProperties() {
+        Map<String, String> propertiesMap = new HashMap<>();
+        for (String key : new TreeSet<>(this.propertiesService.getProperties().stringPropertyNames()).descendingSet())
+            propertiesMap.put(key, this.propertiesService.getProperties().getProperty(key));
+        return propertiesMap;
+    }
+
+    @Override
+    public List<String> getAllAuditLogs() {
         return this.auditLoggerService.getAuditLogList(false);
     }
 }

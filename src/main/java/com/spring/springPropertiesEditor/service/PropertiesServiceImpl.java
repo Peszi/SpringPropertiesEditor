@@ -20,23 +20,7 @@ public class PropertiesServiceImpl implements PropertiesService {
         this.areLoaded = false;
     }
 
-    @Override
-    public void addProperty(Property property) {
-        this.properties.setProperty(property.getKey(), property.getValue());
-    }
-
-    @Override
-    public Optional<String> editProperty(Property property) {
-        final String oldValue = this.properties.getProperty(property.getKey());
-        if (!property.getValue().equals(oldValue) && this.properties.replace(property.getKey(), oldValue, property.getValue()))
-            Optional.of(oldValue);
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean removeProperty(Property property) {
-        return this.properties.remove(property.getKey(), property.getValue());
-    }
+    // R/W
 
     @Override
     public boolean loadProperties(InputStream inputStream) {
@@ -44,7 +28,7 @@ public class PropertiesServiceImpl implements PropertiesService {
             this.properties.clear();
             this.properties.load(inputStream);
             this.areLoaded = true;
-            this.auditLoggerService.logInit();
+//            this.auditLoggerService.logInit();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,6 +47,26 @@ public class PropertiesServiceImpl implements PropertiesService {
         return false;
     }
 
+    // Modify
+
+    @Override
+    public void addProperty(Property property) {
+        this.properties.setProperty(property.getKey(), property.getValue());
+    }
+
+    @Override
+    public Optional<String> editProperty(Property property) {
+        final String oldValue = this.properties.getProperty(property.getKey());
+        if (!property.getValue().equals(oldValue) && this.properties.replace(property.getKey(), oldValue, property.getValue()))
+            Optional.of(oldValue);
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean removeProperty(Property property) {
+        return this.properties.remove(property.getKey(), property.getValue());
+    }
+
     public boolean arePropertiesLoaded() {
         return this.areLoaded;
     }
@@ -70,5 +74,10 @@ public class PropertiesServiceImpl implements PropertiesService {
     @Override
     public boolean hasKey(String key) {
         return this.properties.containsKey(key);
+    }
+
+    @Override
+    public Properties getProperties() {
+        return this.properties;
     }
 }

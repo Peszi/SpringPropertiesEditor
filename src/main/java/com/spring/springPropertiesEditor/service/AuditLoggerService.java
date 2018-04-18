@@ -26,10 +26,6 @@ public class AuditLoggerService {
 
     private List<String> auditLogsList;
 
-    public void logInit() {
-        this.loadAuditLog();
-    }
-
     public void logPropertyCreated(Property property) {
         auditLogger.info(this.ADD_PREFIX + property.getKey() + this.DATA_SEPARATOR + property.getValue());
         this.loadAuditLog();
@@ -46,7 +42,13 @@ public class AuditLoggerService {
     }
 
     public void loadAuditLog() {
-        this.auditLogsList = this.loadLogsList(LogsFileService.AUDIT_FILE + LogsFileService.FILE_LOG_EXT);
+        this.auditLogsList = this.loadLogsList(LogFileServiceImpl.AUDIT_FILE + LogFileServiceImpl.FILE_LOG_EXT);
+    }
+
+    public List<String> getAuditLogList(boolean forceLoad) {
+        if (this.auditLogsList == null || forceLoad)
+            this.loadAuditLog();
+        return this.auditLogsList;
     }
 
     private List<String> loadLogsList(String path) {
@@ -56,11 +58,5 @@ public class AuditLoggerService {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public List<String> getAuditLogList(boolean forceLoad) {
-        if (this.auditLogsList == null || forceLoad)
-            this.loadAuditLog();
-        return this.auditLogsList;
     }
 }

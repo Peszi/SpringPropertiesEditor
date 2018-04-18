@@ -1,6 +1,7 @@
 package com.spring.springPropertiesEditor.controller;
 
 import com.spring.springPropertiesEditor.service.PropertiesFileService;
+import com.spring.springPropertiesEditor.service.PropertiesFileServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,7 @@ public class PropertiesFilesController {
 
     @PostMapping("/upload")
     String uploadFile(@ModelAttribute("file") MultipartFile file, Model model) {
-        if (!this.fileService.loadFile(file))
+        if (!this.fileService.loadPropertiesFile(file))
             model.addAttribute("message", "cannot load this file!");
         return "redirect:/properties"; // TODO
     }
@@ -34,7 +35,7 @@ public class PropertiesFilesController {
     @GetMapping("/download")
     void downloadPropertiesFile(HttpServletResponse response) {
         try {
-            if (this.fileService.isLoaded()) {
+            if (this.fileService.isFileLoaded()) {
                 response.addHeader("Content-Disposition", "attachment; filename=" + this.fileService.getFileName());
                 response.setContentType("application/octet-stream");
                 this.fileService.getPropertiesStream(response.getOutputStream());
@@ -51,8 +52,8 @@ public class PropertiesFilesController {
     @GetMapping("/download/json")
     void downloadJsonAudit(HttpServletResponse response) {
         try {
-            if (this.fileService.isLoaded()) {
-                response.addHeader("Content-Disposition", "attachment; filename=" + this.fileService.getJsonFileName());
+            if (this.fileService.isFileLoaded()) {
+                response.addHeader("Content-Disposition", "attachment; filename=" + this.fileService.getFileName()); // TODO
                 response.setContentType("application/octet-stream");
                 this.fileService.getJsonStream(response.getOutputStream());
                 response.flushBuffer();
@@ -67,8 +68,8 @@ public class PropertiesFilesController {
     @GetMapping("/download/yaml")
     void downloadYamlAudit(HttpServletResponse response) {
         try {
-            if (this.fileService.isLoaded()) {
-                response.addHeader("Content-Disposition", "attachment; filename=" + this.fileService.getYamlFileName());
+            if (this.fileService.isFileLoaded()) {
+                response.addHeader("Content-Disposition", "attachment; filename=" + this.fileService.getFileName()); // TODO
                 response.setContentType("application/octet-stream");
                 this.fileService.getYamlStream(response.getOutputStream());
                 response.flushBuffer();
