@@ -2,6 +2,7 @@ package com.spring.springPropertiesEditor.service;
 
 import com.spring.springPropertiesEditor.model.Property;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +10,7 @@ import java.io.OutputStream;
 import java.util.Optional;
 import java.util.Properties;
 
-@Component
+@Service
 public class PropertiesServiceImpl implements PropertiesService {
 
     private Properties properties;
@@ -67,10 +68,6 @@ public class PropertiesServiceImpl implements PropertiesService {
         return this.properties.remove(property.getKey(), property.getValue());
     }
 
-    public boolean arePropertiesLoaded() {
-        return this.areLoaded;
-    }
-
     @Override
     public boolean hasKey(String key) {
         return this.properties.containsKey(key);
@@ -80,4 +77,9 @@ public class PropertiesServiceImpl implements PropertiesService {
     public Properties getProperties() {
         return this.properties;
     }
+
+
+    public boolean arePropertiesLoaded() {
+        return this.areLoaded;
+    } // TODO
 }

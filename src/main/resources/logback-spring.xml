@@ -21,7 +21,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.spring.springPropertiesEditor.service.AuditLoggerService" level="INFO" additivity="false">
+    <logger name="com.spring.springPropertiesEditor.service.AuditLoggerServiceImpl" level="INFO" additivity="false">
         <appender-ref ref="AUDIT_FILE" />
     </logger>
     <root level="INFO" additivity="false">

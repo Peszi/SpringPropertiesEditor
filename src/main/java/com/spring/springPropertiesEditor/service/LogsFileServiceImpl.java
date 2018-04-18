@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 
 @Service
-public class LogFileServiceImpl implements LogFileService {
+public class LogsFileServiceImpl implements LogsFileService {
 
     public static final String AUDIT_FILE = "Audit";
     public static final String APPLICATION_FILE = "Application";
@@ -17,12 +17,12 @@ public class LogFileServiceImpl implements LogFileService {
 
     @Override
     public File getAuditLogFile() throws FileNotFoundException {
-        return this.getFile(LogFileServiceImpl.AUDIT_FILE + LogFileServiceImpl.FILE_LOG_EXT);
+        return this.getFile(LogsFileServiceImpl.AUDIT_FILE + LogsFileServiceImpl.FILE_LOG_EXT);
     }
 
     @Override
     public File getApplicationLogFile() throws FileNotFoundException {
-        return this.getFile(LogFileServiceImpl.APPLICATION_FILE + LogFileServiceImpl.FILE_LOG_EXT);
+        return this.getFile(LogsFileServiceImpl.APPLICATION_FILE + LogsFileServiceImpl.FILE_LOG_EXT);
     }
 
     private File getFile(String fileName) throws FileNotFoundException {

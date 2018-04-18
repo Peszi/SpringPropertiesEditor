@@ -1,7 +1,8 @@
 package com.spring.springPropertiesEditor.controller;
 
-import com.spring.springPropertiesEditor.service.PropertiesFileService;
-import com.spring.springPropertiesEditor.service.PropertiesFileServiceImpl;
+import com.spring.springPropertiesEditor.service.PropertiesFilesService;
+import com.spring.springPropertiesEditor.util.FileType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,73 +12,44 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Controller
 @RequestMapping("/properties")
 public class PropertiesFilesController {
 
-    private static final String FILE_FAIL_MESSAGE = "Properties are not loaded yet!";
+    private PropertiesFilesService fileService;
 
-    private PropertiesFileService fileService;
-
-    public PropertiesFilesController(PropertiesFileService fileService) {
+    public PropertiesFilesController(PropertiesFilesService fileService) {
         this.fileService = fileService;
     }
 
     @PostMapping("/upload")
-    String uploadFile(@ModelAttribute("file") MultipartFile file, Model model) {
-        if (!this.fileService.loadPropertiesFile(file))
-            model.addAttribute("message", "cannot load this file!");
-        return "redirect:/properties"; // TODO
+    public String uploadFile(@ModelAttribute("file") MultipartFile file, Model model) throws FileNotFoundException {
+        this.fileService.loadPropertiesFile(file);
+        return "redirect:/properties";
     }
 
     @GetMapping("/download")
-    void downloadPropertiesFile(HttpServletResponse response) {
-        try {
-            if (this.fileService.isFileLoaded()) {
-                response.addHeader("Content-Disposition", "attachment; filename=" + this.fileService.getFileName());
-                response.setContentType("application/octet-stream");
-                this.fileService.getPropertiesStream(response.getOutputStream());
-                response.flushBuffer();
-            } else {
-                response.sendRedirect("/properties?message=" + PropertiesFilesController.FILE_FAIL_MESSAGE);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void downloadPropertiesFile(HttpServletResponse response) throws IOException {
+        this.setupResponse(response, FileType.PROPERTIES);
     }
 
-
     @GetMapping("/download/json")
-    void downloadJsonAudit(HttpServletResponse response) {
-        try {
-            if (this.fileService.isFileLoaded()) {
-                response.addHeader("Content-Disposition", "attachment; filename=" + this.fileService.getFileName()); // TODO
-                response.setContentType("application/octet-stream");
-                this.fileService.getJsonStream(response.getOutputStream());
-                response.flushBuffer();
-            } else {
-                response.sendRedirect("/properties?message=" + PropertiesFilesController.FILE_FAIL_MESSAGE);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void downloadJsonAudit(HttpServletResponse response) throws IOException {
+        this.setupResponse(response, FileType.JSON);
     }
 
     @GetMapping("/download/yaml")
-    void downloadYamlAudit(HttpServletResponse response) {
-        try {
-            if (this.fileService.isFileLoaded()) {
-                response.addHeader("Content-Disposition", "attachment; filename=" + this.fileService.getFileName()); // TODO
-                response.setContentType("application/octet-stream");
-                this.fileService.getYamlStream(response.getOutputStream());
-                response.flushBuffer();
-            } else {
-                response.sendRedirect("/properties?message=" + PropertiesFilesController.FILE_FAIL_MESSAGE);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void downloadYamlAudit(HttpServletResponse response) throws IOException {
+        this.setupResponse(response, FileType.YAML);
+    }
+
+    private void setupResponse(HttpServletResponse response, FileType fileType) throws IOException {
+        response.addHeader("Content-Disposition", "attachment; filename=" + this.fileService.getPropertiesFileName(fileType));
+        response.setContentType("application/octet-stream");
+        response.getOutputStream().write(this.fileService.getPropertiesByteArray(fileType));
+        response.flushBuffer();
     }
 }
