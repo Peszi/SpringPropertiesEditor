@@ -32,17 +32,17 @@ public class PropertiesFilesController {
     }
 
     @GetMapping("/download")
-    public void downloadPropertiesFile(HttpServletResponse response) throws IOException {
+    public void getPropertiesFile(HttpServletResponse response) throws IOException {
         this.setupResponse(response, FileType.PROPERTIES);
     }
 
     @GetMapping("/download/json")
-    public void downloadJsonAudit(HttpServletResponse response) throws IOException {
+    public void getJsonProperties(HttpServletResponse response) throws IOException {
         this.setupResponse(response, FileType.JSON);
     }
 
     @GetMapping("/download/yaml")
-    public void downloadYamlAudit(HttpServletResponse response) throws IOException {
+    public void getYamlProperties(HttpServletResponse response) throws IOException {
         this.setupResponse(response, FileType.YAML);
     }
 

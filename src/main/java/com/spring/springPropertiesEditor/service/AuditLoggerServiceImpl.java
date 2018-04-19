@@ -2,7 +2,6 @@ package com.spring.springPropertiesEditor.service;
 
 import com.spring.springPropertiesEditor.model.Property;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ public class AuditLoggerServiceImpl implements AuditLoggerService {
 
     @Override
     public void loadAuditLog() {
-        this.auditLogsList = this.loadLogsList(LogsFileServiceImpl.AUDIT_FILE + LogsFileServiceImpl.FILE_LOG_EXT);
+        this.auditLogsList = this.loadLogsList(LoggerFilesServiceImpl.AUDIT_FILE + LoggerFilesServiceImpl.FILE_LOG_EXT);
     }
 
     @Override

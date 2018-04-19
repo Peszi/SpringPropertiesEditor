@@ -1,5 +1,6 @@
 package com.spring.springPropertiesEditor.service;
 
+import com.spring.springPropertiesEditor.exception.BadRequestException;
 import com.spring.springPropertiesEditor.model.Property;
 import org.springframework.stereotype.Service;
 
@@ -17,28 +18,23 @@ public class ManagePropertiesServiceImpl implements ManagePropertiesService {
     }
 
     @Override
-    public boolean addOrChangeProperty(Property property) {
+    public void addOrChangeProperty(Property property) {
         if (!this.propertiesService.hasKey(property.getKey())) {
             this.propertiesService.addProperty(property);
             this.auditLoggerService.logPropertyCreated(property);
-            return true;
         } else {
             Optional<String> oldValue = this.propertiesService.editProperty(property);
-            if (oldValue.isPresent()) {
+            if (oldValue.isPresent())
                 this.auditLoggerService.logPropertyEdited(property, oldValue.get());
-                return true;
-            }
         }
-        return false;
+        throw new BadRequestException("Cannot add or change this property!");
     }
 
     @Override
-    public boolean removeProperty(Property property) {
-        if (this.propertiesService.removeProperty(property)) {
+    public void removeProperty(Property property) {
+        if (this.propertiesService.removeProperty(property))
             this.auditLoggerService.logPropertyRemoved(property);
-            return true;
-        }
-        return false;
+        throw new BadRequestException("Cannot remove this property!");
     }
 
     @Override

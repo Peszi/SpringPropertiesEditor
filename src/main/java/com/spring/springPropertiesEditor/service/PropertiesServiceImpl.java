@@ -1,7 +1,8 @@
 package com.spring.springPropertiesEditor.service;
 
 import com.spring.springPropertiesEditor.model.Property;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -10,15 +11,14 @@ import java.io.OutputStream;
 import java.util.Optional;
 import java.util.Properties;
 
+@Slf4j
 @Service
 public class PropertiesServiceImpl implements PropertiesService {
 
     private Properties properties;
-    private boolean areLoaded;
 
-    public PropertiesServiceImpl() {
-        this.properties = new Properties();
-        this.areLoaded = false;
+    public PropertiesServiceImpl(@Qualifier("UserProperties") Properties properties) {
+        this.properties = properties;
     }
 
     // R/W
@@ -28,8 +28,7 @@ public class PropertiesServiceImpl implements PropertiesService {
         try {
             this.properties.clear();
             this.properties.load(inputStream);
-            this.areLoaded = true;
-//            this.auditLoggerService.logInit();
+            //this.auditLoggerService.logInit();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,8 +57,8 @@ public class PropertiesServiceImpl implements PropertiesService {
     @Override
     public Optional<String> editProperty(Property property) {
         final String oldValue = this.properties.getProperty(property.getKey());
-        if (!property.getValue().equals(oldValue) && this.properties.replace(property.getKey(), oldValue, property.getValue()))
-            Optional.of(oldValue);
+        if (oldValue != null && this.properties.replace(property.getKey(), oldValue, property.getValue()))
+            return Optional.of(oldValue);
         return Optional.empty();
     }
 
@@ -78,8 +77,4 @@ public class PropertiesServiceImpl implements PropertiesService {
         return this.properties;
     }
 
-
-    public boolean arePropertiesLoaded() {
-        return this.areLoaded;
-    } // TODO
 }

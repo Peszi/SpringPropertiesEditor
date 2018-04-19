@@ -1,7 +1,6 @@
 package com.spring.springPropertiesEditor.controller;
 
-import com.spring.springPropertiesEditor.service.LogsFileService;
-import com.spring.springPropertiesEditor.service.LogsFileServiceImpl;
+import com.spring.springPropertiesEditor.service.LoggerFilesService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,29 +12,29 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 @Controller
-@RequestMapping("/log")
+@RequestMapping("/logger")
 public class LoggerFilesController {
 
-    private LogsFileService logsFileService;
+    private LoggerFilesService loggerFilesService;
 
-    public LoggerFilesController(LogsFileService logsFileService) {
-        this.logsFileService = logsFileService;
+    public LoggerFilesController(LoggerFilesService loggerFilesService) {
+        this.loggerFilesService = loggerFilesService;
     }
 
     @GetMapping("/audit")
     @ResponseBody
-    FileSystemResource downloadAuditFile(HttpServletResponse response) throws FileNotFoundException {
-        File file = this.logsFileService.getAuditLogFile();
-        response.addHeader("Content-Disposition", "attachment; filename=" + LogsFileServiceImpl.AUDIT_FILE + LogsFileServiceImpl.FILE_LOG_EXT);
-        response.setContentType("application/octet-stream");
-        return new FileSystemResource(file);
+    FileSystemResource getAuditFile(HttpServletResponse response) throws FileNotFoundException {
+        return this.getLoggerFile(response, this.loggerFilesService.getAuditLogFile());
     }
 
     @GetMapping("/application")
     @ResponseBody
-    FileSystemResource downloadApplicationFile(HttpServletResponse response) throws FileNotFoundException {
-        File file = this.logsFileService.getApplicationLogFile();
-        response.addHeader("Content-Disposition", "attachment; filename=" + LogsFileServiceImpl.APPLICATION_FILE + LogsFileServiceImpl.FILE_LOG_EXT);
+    FileSystemResource getApplicationFile(HttpServletResponse response) throws FileNotFoundException {
+        return this.getLoggerFile(response, this.loggerFilesService.getApplicationLogFile());
+    }
+
+    private FileSystemResource getLoggerFile(HttpServletResponse response, File file) {
+        response.addHeader("Content-Disposition", "attachment; filename=" + file.getName());
         response.setContentType("application/octet-stream");
         return new FileSystemResource(file);
     }

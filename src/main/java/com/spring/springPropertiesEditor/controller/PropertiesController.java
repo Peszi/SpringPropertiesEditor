@@ -34,13 +34,6 @@ public class PropertiesController {
         return "redirect:/properties";
     }
 
-    @GetMapping
-    public String getProperties(@RequestParam(required = false) String key, @RequestParam(required = false) String message, Model model) {
-        this.setupModel(model, this.managePropertiesService.getProperty(key)); // TODO
-        model.addAttribute("message", message);
-        return "properties";
-    }
-
     @PostMapping("/delete")
     public String removeProperty(@RequestParam Map<String, String> properties, Model model) {
         if (properties != null && properties.size() == 1) {
@@ -53,7 +46,13 @@ public class PropertiesController {
         return "redirect:/properties";
     }
 
-    @ModelAttribute
+    @GetMapping
+    public String getProperties(@RequestParam(required = false) String key, @RequestParam(required = false) String message, Model model) {
+        this.setupModel(model, this.managePropertiesService.getProperty(key));
+        model.addAttribute("message", message);
+        return "properties";
+    }
+
     public void setupModel(Model model, Property inputProperty) {
         model.addAttribute("property", inputProperty);
         model.addAttribute("properties", this.managePropertiesService.getAllProperties());
