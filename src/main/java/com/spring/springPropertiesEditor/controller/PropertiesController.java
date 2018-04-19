@@ -23,7 +23,7 @@ public class PropertiesController {
     }
 
     @PostMapping
-    public String changeOrAddProperty(@ModelAttribute Property property, BindingResult binding, Model model) {
+    public String changeOrAddProperty(@Valid @ModelAttribute Property property, BindingResult binding, Model model) {
         if (!binding.hasErrors()) {
             this.managePropertiesService.addOrChangeProperty(property);
             property.cleanUp();
@@ -53,7 +53,7 @@ public class PropertiesController {
         return "properties";
     }
 
-    public void setupModel(Model model, Property inputProperty) {
+    private void setupModel(Model model, Property inputProperty) {
         model.addAttribute("property", inputProperty);
         model.addAttribute("properties", this.managePropertiesService.getAllProperties());
         model.addAttribute("changes", this.managePropertiesService.getAllAuditLogs());

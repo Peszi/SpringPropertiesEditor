@@ -15,7 +15,7 @@ public class Property {
 
     public Property() {}
 
-    public Property(@NotNull String key, @NotNull String value) {
+    public Property(@NotNull @NotEmpty String key, @NotNull String value) {
         this.key = key.trim();
         this.value = value.trim();
     }

@@ -28,7 +28,6 @@ public class PropertiesServiceImpl implements PropertiesService {
         try {
             this.properties.clear();
             this.properties.load(inputStream);
-            //this.auditLoggerService.logInit();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
