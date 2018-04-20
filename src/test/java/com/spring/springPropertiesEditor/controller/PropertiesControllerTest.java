@@ -7,103 +7,161 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 public class PropertiesControllerTest {
 
     private static final String API_PATH = "/properties";
+    public static final String SOME_KEY = "someKey";
+    public static final String SOME_VALUE = "someValue";
 
     @Mock
     ManagePropertiesService managePropertiesService;
 
-    @Mock
-    Model model;
-
-    @Mock
-    BindingResult result;
-
-    PropertiesController controller;
+    PropertiesController propertiesController;
 
     MockMvc mockMvc;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.controller = new PropertiesController(this.managePropertiesService);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(this.controller).build();
+        this.propertiesController = new PropertiesController(this.managePropertiesService);
+
+        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+        viewResolver.setPrefix("/WEB-INF/jsp/view/");
+        viewResolver.setSuffix(".jsp");
+
+        this.mockMvc = MockMvcBuilders.standaloneSetup(propertiesController)
+                .setViewResolvers(viewResolver).build();
     }
 
     @Test
     public void changeOrAddProperty() throws Exception {
+        // Given
+        Property property = new Property(SOME_KEY, SOME_VALUE);
 
-        Property property = new Property();
-        property.setKey("someKey");
-        property.setValue("someValue");
+        when(managePropertiesService.addOrChangeProperty(any(Property.class))).thenReturn(true);
 
-        ArgumentCaptor<Property> propertyArgumentCaptor = ArgumentCaptor.forClass(Property.class);
+        // When
+        this.mockMvc.perform(post(API_PATH).flashAttr("property", property))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attributeDoesNotExist("message"))
+                .andExpect(view().name("redirect:/properties"));
 
-        String viewName = this.controller.changeOrAddProperty(property, result, model);
-
-        assertEquals("redirect:/properties", viewName);
+        // Then
         verify(managePropertiesService, times(1)).addOrChangeProperty(any(Property.class));
-        verify(model, never()).addAttribute(eq("message"));
-        verify(model, times(1)).addAttribute(eq("property"), propertyArgumentCaptor.capture());
-        verify(model, times(1)).addAttribute(eq("properties"), any());
-        verify(model, times(1)).addAttribute(eq("changes"), any());
-        assertEquals("", propertyArgumentCaptor.getValue().getKey());
     }
 
     @Test
-    public void removeProperty() {
+    public void removeProperty() throws Exception {
+        // Given
+        MultiValueMap<String, String> properties = new HttpHeaders();
+        properties.add(SOME_KEY, SOME_VALUE);
 
-        Property property = new Property(); property.setKey("someKey"); property.setValue("someValue");
-        Map<String, String> paramMap = new HashMap<>(); paramMap.put(property.getKey(), property.getValue());
+        when(managePropertiesService.removeProperty(any(Property.class))).thenReturn(true);
 
-        ArgumentCaptor<Property> propertyArgumentCaptor = ArgumentCaptor.forClass(Property.class);
+        // When
+        this.mockMvc.perform(post(API_PATH + "/delete").params(properties))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attributeDoesNotExist("message"))
+                .andExpect(view().name("redirect:/properties"));
 
-        String viewName = this.controller.removeProperty(paramMap, model);
-
-        assertEquals("redirect:/properties", viewName);
-        verify(managePropertiesService, times(1)).removeProperty(propertyArgumentCaptor.capture());
-        verify(model, never()).addAttribute(eq("message"));
-        verify(model, times(1)).addAttribute(eq("property"), any());
-        verify(model, times(1)).addAttribute(eq("properties"), any());
-        verify(model, times(1)).addAttribute(eq("changes"), any());
-        assertEquals(property.getKey(), propertyArgumentCaptor.getValue().getKey());
-        assertEquals(property.getValue(), propertyArgumentCaptor.getValue().getValue());
+        // Then
+        verify(managePropertiesService, times(1)).removeProperty(any(Property.class));
     }
 
     @Test
-    public void removePropertyFail() {
+    public void removePropertyFail() throws Exception {
+        // Given
+        when(managePropertiesService.removeProperty(any(Property.class))).thenReturn(true);
 
-        Property property = new Property(); property.setKey("someKey"); property.setValue("someValue");
+        // When
+        this.mockMvc.perform(post(API_PATH + "/delete").params(new HttpHeaders()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attributeExists("message"))
+                .andExpect(view().name("redirect:/properties"));
 
-        String viewName = this.controller.removeProperty(new HashMap<>(), model);
-
-        assertEquals("redirect:/properties", viewName);
-        verify(managePropertiesService, never()).removeProperty(any());
-        verify(model, times(1)).addAttribute(eq("message"), anyString());
+        // Then
+        verify(managePropertiesService, never()).removeProperty(any(Property.class));
     }
 
     @Test
-    public void getProperties() {
-        String viewName = this.controller.getProperties("", "", model);
-        assertEquals("properties", viewName);
+    public void getProperties() throws Exception {
+        // Given
+        Property property = new Property(SOME_KEY, SOME_VALUE);
+        when(managePropertiesService.getProperty(anyString())).thenReturn(property);
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+
+        // When
+        this.mockMvc.perform(get(API_PATH).param("key", SOME_KEY).param("message", "someMessage"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attributeExists("message"))
+                .andExpect(model().attributeExists("property"))
+                .andExpect(model().attributeExists("properties"))
+                .andExpect(model().attributeExists("changes"));
+
+        // Then
+        verify(managePropertiesService, times(1)).getProperty(stringArgumentCaptor.capture());
         verify(managePropertiesService, times(1)).getAllProperties();
-        verify(model, times(1)).addAttribute(eq("message"), anyString());
+        verify(managePropertiesService, times(1)).getAllAuditLogs();
+        assertEquals(SOME_KEY, stringArgumentCaptor.getValue());
+    }
+
+    @Test
+    public void getPropertiesWoMessage() throws Exception {
+        // Given
+        Property property = new Property(SOME_KEY, SOME_VALUE);
+        when(managePropertiesService.getProperty(anyString())).thenReturn(property);
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+
+        // When
+        this.mockMvc.perform(get(API_PATH).param("key", SOME_KEY))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attributeDoesNotExist("message"))
+                .andExpect(model().attributeExists("property"))
+                .andExpect(model().attributeExists("properties"))
+                .andExpect(model().attributeExists("changes"));
+
+        // Then
+        verify(managePropertiesService, times(1)).getProperty(stringArgumentCaptor.capture());
+        verify(managePropertiesService, times(1)).getAllProperties();
+        verify(managePropertiesService, times(1)).getAllAuditLogs();
+        assertEquals(SOME_KEY, stringArgumentCaptor.getValue());
+    }
+
+    @Test
+    public void getPropertiesWoKey() throws Exception {
+        // Given
+        Property property = new Property(SOME_KEY, SOME_VALUE);
+        when(managePropertiesService.getProperty(anyString())).thenReturn(property);
+
+        // When
+        this.mockMvc.perform(get(API_PATH))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attributeDoesNotExist("message"))
+                .andExpect(model().attributeDoesNotExist("property"))
+                .andExpect(model().attributeExists("properties"))
+                .andExpect(model().attributeExists("changes"));
+
+        // Then
+        verify(managePropertiesService, never()).getProperty(anyString());
+        verify(managePropertiesService, times(1)).getAllProperties();
+        verify(managePropertiesService, times(1)).getAllAuditLogs();
     }
 }

@@ -19,8 +19,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.booleanThat;
 import static org.mockito.Mockito.verify;
 
-@Slf4j
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PropertiesServiceImplTest {
 
     private static final Property SOME_PROPERTY_A = new Property("some.keyA", "some.valueA");

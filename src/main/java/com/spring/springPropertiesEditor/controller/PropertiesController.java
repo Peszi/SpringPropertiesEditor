@@ -3,8 +3,10 @@ package com.spring.springPropertiesEditor.controller;
 import com.spring.springPropertiesEditor.service.ManagePropertiesService;
 import com.spring.springPropertiesEditor.service.ManagePropertiesServiceImpl;
 import com.spring.springPropertiesEditor.model.Property;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,7 @@ import javax.validation.Valid;
 import java.util.Map;
 import java.util.TreeMap;
 
+@Slf4j
 @Controller
 @RequestMapping("/properties")
 public class PropertiesController {
@@ -35,9 +38,9 @@ public class PropertiesController {
     }
 
     @PostMapping("/delete")
-    public String removeProperty(@RequestParam Map<String, String> properties, Model model) {
-        if (properties != null && properties.size() == 1) {
-            final Map.Entry<String, String> property = properties.entrySet().iterator().next();
+    public String removeProperty(@RequestParam MultiValueMap<String, String> properties, Model model) {
+        if (!properties.isEmpty()) {
+            final Map.Entry<String, String> property = properties.toSingleValueMap().entrySet().iterator().next();
             this.managePropertiesService.removeProperty(new Property(property.getKey(), property.getValue()));
         } else {
             model.addAttribute("message", "cannot remove entry!");
@@ -50,6 +53,7 @@ public class PropertiesController {
     public String getProperties(@RequestParam(required = false) String key, @RequestParam(required = false) String message, Model model) {
         this.setupModel(model, this.managePropertiesService.getProperty(key));
         model.addAttribute("message", message);
+        log.info("message", message);
         return "properties";
     }
 

@@ -12,9 +12,7 @@ import java.util.Properties;
 public class BasicConfiguration {
 
     @Bean("UserProperties")
-    @Scope("singleton")
     public Properties getProperties() {
-        log.info("Getting PROPERTIES BEAN!");
         return new Properties();
     }
 

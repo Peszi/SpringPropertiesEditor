@@ -22,9 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -56,7 +54,8 @@ public class PropertiesFilesControllerTest {
 
         this.mockMvc.perform(multipart("/properties/upload").file(multipartFile))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(model().attributeDoesNotExist("message"));
+                .andExpect(model().attributeDoesNotExist("message"))
+                .andExpect(view().name("redirect:/properties"));
 
         verify(filesService, times(1)).loadPropertiesFile(any(MultipartFile.class));
     }

@@ -28,8 +28,8 @@ public class PropertiesFilesRestController {
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity uploadFile(@ModelAttribute MultipartFile file) throws FileNotFoundException {
-        if (file != null && file.getContentType().equals("multipart/form-data")) {
+    public ResponseEntity uploadFile(@RequestParam MultipartFile file) throws FileNotFoundException {
+        if (!file.isEmpty() && file.getContentType().equals("multipart/form-data")) {
             this.fileService.loadPropertiesFile(file);
             return ResponseEntity.ok().build();
         }
