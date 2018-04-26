@@ -30,16 +30,11 @@ public class PropertiesFilesServiceImpl implements PropertiesFilesService {
 
     // Properties loader
     @Override
-    public boolean loadPropertiesFile(MultipartFile multipartFile) throws FileNotFoundException {
-        try {
-            if (multipartFile != null && multipartFile.getOriginalFilename().endsWith(".properties")) {
-                this.setFileName(multipartFile.getOriginalFilename());
-                return this.propertiesService.loadProperties(multipartFile.getInputStream());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        throw new FileNotFoundException("Cannot upload this file!");
+    public boolean loadPropertiesFile(MultipartFile multipartFile) throws IOException {
+        if (!multipartFile.getOriginalFilename().endsWith(".properties"))
+            throw new FileNotFoundException("Cannot upload this file, .properties format expected!");
+        this.setFileName(multipartFile.getOriginalFilename());
+        return this.propertiesService.loadProperties(multipartFile.getInputStream());
     }
 
     // Getter properties array

@@ -20,28 +20,25 @@ public class ManagePropertiesServiceImpl implements ManagePropertiesService {
     }
 
     @Override
-    public boolean addOrChangeProperty(Property property) {
+    public void addOrChangeProperty(Property property) {
         if (!this.propertiesService.hasKey(property.getKey())) {
             this.propertiesService.addProperty(property);
             this.auditLoggerService.logPropertyCreated(property);
-            return true;
         } else {
             Optional<String> oldValue = this.propertiesService.editProperty(property);
             if (oldValue.isPresent()) {
                 this.auditLoggerService.logPropertyEdited(property, oldValue.get());
-                return true;
+            } else {
+                throw new BadRequestException();
             }
         }
-        throw new BadRequestException("Cannot add or change this property!");
     }
 
     @Override
-    public boolean removeProperty(Property property) {
-        if (this.propertiesService.removeProperty(property)) {
-            this.auditLoggerService.logPropertyRemoved(property);
-            return true;
-        }
-        throw new BadRequestException("Cannot remove this property!");
+    public void removeProperty(Property property) {
+        if (!this.propertiesService.removeProperty(property))
+            throw new BadRequestException("Cannot remove this property!");
+        this.auditLoggerService.logPropertyRemoved(property);
     }
 
     @Override

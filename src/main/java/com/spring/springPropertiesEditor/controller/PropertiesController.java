@@ -53,7 +53,7 @@ public class PropertiesController {
     public String getProperties(@RequestParam(required = false) String key, @RequestParam(required = false) String message, Model model) {
         this.setupModel(model, this.managePropertiesService.getProperty(key));
         model.addAttribute("message", message);
-        log.info("message", message);
+//        log.info("message", message);
         return "properties";
     }
 

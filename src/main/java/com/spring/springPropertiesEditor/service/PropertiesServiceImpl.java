@@ -1,5 +1,6 @@
 package com.spring.springPropertiesEditor.service;
 
+import com.spring.springPropertiesEditor.exception.BadRequestException;
 import com.spring.springPropertiesEditor.model.Property;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -56,9 +57,8 @@ public class PropertiesServiceImpl implements PropertiesService {
     @Override
     public Optional<String> editProperty(Property property) {
         final String oldValue = this.properties.getProperty(property.getKey());
-        if (oldValue != null && this.properties.replace(property.getKey(), oldValue, property.getValue()))
-            return Optional.of(oldValue);
-        return Optional.empty();
+        this.properties.replace(property.getKey(), oldValue, property.getValue());
+        return Optional.of(oldValue);
     }
 
     @Override

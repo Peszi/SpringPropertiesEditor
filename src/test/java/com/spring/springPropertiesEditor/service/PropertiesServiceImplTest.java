@@ -40,7 +40,7 @@ public class PropertiesServiceImplTest {
     }
 
     @Test
-    public void loadProperties() throws IOException {
+    public void loadProperties() {
         // Given
         ByteArrayInputStream inputStream = new ByteArrayInputStream(SOME_PROPERTIES.getBytes());
         // When

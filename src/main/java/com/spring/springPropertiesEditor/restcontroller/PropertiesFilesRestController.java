@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -28,26 +29,23 @@ public class PropertiesFilesRestController {
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity uploadFile(@RequestParam MultipartFile file) throws FileNotFoundException {
-        if (!file.isEmpty() && file.getContentType().equals("multipart/form-data")) {
-            this.fileService.loadPropertiesFile(file);
-            return ResponseEntity.ok().build();
-        }
-        throw new BadRequestException("Incorrect file parameter!");
+    public ResponseEntity uploadFile(@RequestParam MultipartFile file) throws IOException {
+        this.fileService.loadPropertiesFile(file);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/download")
-    public ResponseEntity getPropertiesFile() throws IOException {
+    public ResponseEntity getPropertiesFile() throws FileNotFoundException {
         return this.setupResponse(FileType.PROPERTIES);
     }
 
     @GetMapping("/download/json")
-    public ResponseEntity getJsonFile() throws IOException {
+    public ResponseEntity getJsonFile() throws FileNotFoundException {
         return this.setupResponse(FileType.JSON);
     }
 
     @GetMapping("/download/yaml")
-    public ResponseEntity getYamlFile() throws IOException {
+    public ResponseEntity getYamlFile() throws FileNotFoundException {
         return this.setupResponse(FileType.YAML);
     }
 

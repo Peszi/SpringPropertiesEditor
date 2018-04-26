@@ -45,16 +45,13 @@ public class PropertiesControllerTest {
         viewResolver.setPrefix("/WEB-INF/jsp/view/");
         viewResolver.setSuffix(".jsp");
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(propertiesController)
-                .setViewResolvers(viewResolver).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(propertiesController).setViewResolvers(viewResolver).build();
     }
 
     @Test
     public void changeOrAddProperty() throws Exception {
         // Given
         Property property = new Property(SOME_KEY, SOME_VALUE);
-
-        when(managePropertiesService.addOrChangeProperty(any(Property.class))).thenReturn(true);
 
         // When
         this.mockMvc.perform(post(API_PATH).flashAttr("property", property))
@@ -67,12 +64,23 @@ public class PropertiesControllerTest {
     }
 
     @Test
+    public void changeOrAddPropertyFail() throws Exception {
+        // Given
+        // When
+        this.mockMvc.perform(post(API_PATH).flashAttr("property", new Property()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attributeExists("message"))
+                .andExpect(view().name("redirect:/properties"));
+
+        // Then
+        verify(managePropertiesService, never()).addOrChangeProperty(any(Property.class));
+    }
+
+    @Test
     public void removeProperty() throws Exception {
         // Given
         MultiValueMap<String, String> properties = new HttpHeaders();
         properties.add(SOME_KEY, SOME_VALUE);
-
-        when(managePropertiesService.removeProperty(any(Property.class))).thenReturn(true);
 
         // When
         this.mockMvc.perform(post(API_PATH + "/delete").params(properties))
@@ -87,8 +95,6 @@ public class PropertiesControllerTest {
     @Test
     public void removePropertyFail() throws Exception {
         // Given
-        when(managePropertiesService.removeProperty(any(Property.class))).thenReturn(true);
-
         // When
         this.mockMvc.perform(post(API_PATH + "/delete").params(new HttpHeaders()))
                 .andExpect(status().is3xxRedirection())

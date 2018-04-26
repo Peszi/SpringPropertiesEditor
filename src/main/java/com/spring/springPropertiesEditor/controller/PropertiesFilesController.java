@@ -23,7 +23,7 @@ public class PropertiesFilesController {
     }
 
     @PostMapping("/upload")
-    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws FileNotFoundException {
+    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws IOException {
         this.fileService.loadPropertiesFile(file);
         return "redirect:/properties";
     }

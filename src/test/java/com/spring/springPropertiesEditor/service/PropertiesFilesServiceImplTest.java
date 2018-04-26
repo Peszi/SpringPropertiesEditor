@@ -44,7 +44,7 @@ public class PropertiesFilesServiceImplTest {
     }
 
     @Test
-    public void loadPropertiesFile() throws FileNotFoundException {
+    public void loadPropertiesFile() throws IOException {
         MockMultipartFile multipartFile = new MockMultipartFile("file", FILE_NAME, "text/plain", SOME_PROPERTIES.getBytes());
 
         when(propertiesService.loadProperties(any(InputStream.class))).thenReturn(true);
@@ -58,7 +58,7 @@ public class PropertiesFilesServiceImplTest {
     }
 
     @Test
-    public void loadPropertiesJsonFile() throws FileNotFoundException {
+    public void loadPropertiesJsonFile() throws IOException {
         final String JSON_FILE_NAME = FILE_NAME.split("\\.")[0] + ".json";
         MockMultipartFile multipartFile = new MockMultipartFile("file", FILE_NAME, "text/plain", SOME_PROPERTIES.getBytes());
 
@@ -76,6 +76,7 @@ public class PropertiesFilesServiceImplTest {
     public void getPropertiesByteArray() throws IOException {
         when(propertiesService.saveProperties(any(OutputStream.class))).thenReturn(true);
         this.propertiesFilesService.getPropertiesByteArray(FileType.PROPERTIES);
+//        verify(propertiesService, times(1)).saveProperties(any(OutputStream.class)));
     }
 
     @Test(expected = FileNotFoundException.class)

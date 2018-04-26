@@ -75,9 +75,7 @@ public class PropertiesRestControllerTest {
     @Test
     public void removeProperty() throws Exception {
 
-        Property property = new Property();
-        property.setKey("someKey");
-        property.setValue("someValue");
+        Property property = new Property("someKey", "someValue");
 
         this.mockMvc.perform(delete(API_PATH).flashAttr("property", property))
                 .andExpect(status().is2xxSuccessful());

@@ -37,12 +37,11 @@ public class ManagePropertiesServiceImplTest {
         Property property = new Property("someKey", "someValue");
         when(this.propertiesService.hasKey(anyString())).thenReturn(false);
         // When
-        boolean result = this.managePropertiesService.addOrChangeProperty(property);
+        this.managePropertiesService.addOrChangeProperty(property);
         // Then
         verify(this.propertiesService, times(1)).hasKey(anyString());
         verify(this.propertiesService, times(1)).addProperty(any(Property.class));
         verify(this.propertiesService, never()).editProperty(any(Property.class));
-        assertTrue(result);
     }
 
     @Test
@@ -52,12 +51,11 @@ public class ManagePropertiesServiceImplTest {
         when(this.propertiesService.hasKey(anyString())).thenReturn(true);
         when(this.propertiesService.editProperty(any(Property.class))).thenReturn(Optional.of("oldValue"));
         // When
-        boolean result = this.managePropertiesService.addOrChangeProperty(property);
+        this.managePropertiesService.addOrChangeProperty(property);
         // Then
         verify(this.propertiesService, times(1)).hasKey(anyString());
         verify(this.propertiesService, times(1)).editProperty(any(Property.class));
         verify(this.propertiesService, never()).addProperty(any(Property.class));
-        assertTrue(result);
     }
 
     @Test(expected = BadRequestException.class)
@@ -67,12 +65,11 @@ public class ManagePropertiesServiceImplTest {
         when(this.propertiesService.hasKey(anyString())).thenReturn(true);
         when(this.propertiesService.editProperty(any(Property.class))).thenReturn(Optional.empty());
         // When
-        boolean result = this.managePropertiesService.addOrChangeProperty(property);
+        this.managePropertiesService.addOrChangeProperty(property);
         // Then
         verify(this.propertiesService, times(1)).hasKey(anyString());
         verify(this.propertiesService, times(1)).editProperty(any(Property.class));
         verify(this.propertiesService, never()).addProperty(any(Property.class));
-        assertTrue(result);
     }
 
     @Test
@@ -80,11 +77,21 @@ public class ManagePropertiesServiceImplTest {
         Property property = new Property("someKey", "someValue");
         when(this.propertiesService.removeProperty(any(Property.class))).thenReturn(true);
         // When
-        boolean result = this.managePropertiesService.removeProperty(property);
+        this.managePropertiesService.removeProperty(property);
         // Then
         verify(this.propertiesService, times(1)).removeProperty(any(Property.class));
-        assertTrue(result);
     }
+
+    @Test(expected = BadRequestException.class)
+    public void removeNotExistingProperty() {
+        Property property = new Property("someKey", "someValue");
+        when(this.propertiesService.removeProperty(any(Property.class))).thenReturn(false);
+        // When
+        this.managePropertiesService.removeProperty(property);
+        // Then
+        verify(this.propertiesService, times(1)).removeProperty(any(Property.class));
+    }
+
 
     @Test
     public void getProperty() {

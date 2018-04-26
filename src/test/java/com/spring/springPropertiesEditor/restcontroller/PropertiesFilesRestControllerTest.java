@@ -1,5 +1,6 @@
 package com.spring.springPropertiesEditor.restcontroller;
 
+import com.spring.springPropertiesEditor.exception.RestExceptionHandler;
 import com.spring.springPropertiesEditor.service.PropertiesFilesService;
 import com.spring.springPropertiesEditor.util.FileType;
 import org.junit.Before;
@@ -13,6 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +44,9 @@ public class PropertiesFilesRestControllerTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         this.filesController = new PropertiesFilesRestController(filesService);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(this.filesController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(this.filesController)
+                .setControllerAdvice(new RestExceptionHandler())
+                .build();
     }
 
     @Test
@@ -59,12 +63,14 @@ public class PropertiesFilesRestControllerTest {
 
     @Test
     public void uploadIncorrectFile() throws Exception {
-        when(filesService.loadPropertiesFile(any(MultipartFile.class))).thenReturn(true);
+        MockMultipartFile multipartFile = new MockMultipartFile("file", FILE_NAME, "multipart/form-data", API_PATH.getBytes());
 
-        this.mockMvc.perform(multipart(API_PATH + "/upload"))
+        when(filesService.loadPropertiesFile(any(MultipartFile.class))).thenThrow(new FileNotFoundException());
+
+        this.mockMvc.perform(multipart(API_PATH + "/upload").file(multipartFile))
                 .andExpect(status().is4xxClientError());
 
-        verify(filesService, times(0)).loadPropertiesFile(any(MultipartFile.class));
+        verify(filesService, times(1)).loadPropertiesFile(any(MultipartFile.class));
     }
 
     @Test
@@ -84,6 +90,19 @@ public class PropertiesFilesRestControllerTest {
 
         verify(filesService, times(1)).getPropertiesByteArray(any(FileType.class));
         assertEquals(SOME_PROPERTIES, resultContent);
+    }
+
+    @Test
+    public void downloadPropertiesFileWithoutFile() throws Exception {
+
+        FileType fileType = FileType.PROPERTIES;
+        when(filesService.getPropertiesFileName(fileType)).thenReturn(FILE_NAME);
+        when(filesService.getPropertiesByteArray(fileType)).thenThrow(new FileNotFoundException());
+
+        this.mockMvc.perform(get(API_PATH + "/download"))
+                .andExpect(status().is4xxClientError());
+
+        verify(filesService, times(1)).getPropertiesByteArray(any(FileType.class));
     }
 
     @Test
