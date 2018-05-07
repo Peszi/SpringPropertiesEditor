@@ -1,8 +1,6 @@
 package com.spring.springPropertiesEditor.service;
 
-import com.spring.springPropertiesEditor.exception.BadRequestException;
 import com.spring.springPropertiesEditor.model.Property;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +10,6 @@ import java.io.OutputStream;
 import java.util.Optional;
 import java.util.Properties;
 
-@Slf4j
 @Service
 public class PropertiesServiceImpl implements PropertiesService {
 
@@ -56,9 +53,7 @@ public class PropertiesServiceImpl implements PropertiesService {
 
     @Override
     public Optional<String> editProperty(Property property) {
-        final String oldValue = this.properties.getProperty(property.getKey());
-        this.properties.replace(property.getKey(), oldValue, property.getValue());
-        return Optional.of(oldValue);
+        return Optional.ofNullable((String) this.properties.replace(property.getKey(), property.getValue()));
     }
 
     @Override

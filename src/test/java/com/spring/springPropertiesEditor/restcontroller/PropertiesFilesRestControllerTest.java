@@ -1,6 +1,6 @@
 package com.spring.springPropertiesEditor.restcontroller;
 
-import com.spring.springPropertiesEditor.exception.RestExceptionHandler;
+import com.spring.springPropertiesEditor.exception.RestAdviceController;
 import com.spring.springPropertiesEditor.service.PropertiesFilesService;
 import com.spring.springPropertiesEditor.util.FileType;
 import org.junit.Before;
@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,7 +44,7 @@ public class PropertiesFilesRestControllerTest {
         MockitoAnnotations.initMocks(this);
         this.filesController = new PropertiesFilesRestController(filesService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(this.filesController)
-                .setControllerAdvice(new RestExceptionHandler())
+                .setControllerAdvice(new RestAdviceController())
                 .build();
     }
 

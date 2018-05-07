@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.spring.springPropertiesEditor.util.FileType;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,9 +41,9 @@ public class PropertiesFilesServiceImpl implements PropertiesFilesService {
     public byte[] getPropertiesByteArray(FileType fileType) throws FileNotFoundException {
         switch (fileType) {
             case JSON:
-                return this.getMapperByteArray(new ObjectMapper(new JsonFactory()));
+                return this.getMappedByteArray(new ObjectMapper(new JsonFactory()));
             case YAML:
-                return this.getMapperByteArray(new ObjectMapper(new YAMLFactory()));
+                return this.getMappedByteArray(new ObjectMapper(new YAMLFactory()));
         }
         return this.getPropertiesByteArray();
     }
@@ -56,7 +55,7 @@ public class PropertiesFilesServiceImpl implements PropertiesFilesService {
         throw new FileNotFoundException("Cannot find properties file!");
     }
 
-    private byte[] getMapperByteArray(ObjectMapper objectMapper) throws FileNotFoundException {
+    private byte[] getMappedByteArray(ObjectMapper objectMapper) throws FileNotFoundException {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             objectMapper.writeValue(byteArrayOutputStream, this.propertiesService.getProperties());
