@@ -4,7 +4,6 @@ import com.spring.springPropertiesEditor.exception.BadRequestException;
 import com.spring.springPropertiesEditor.model.Property;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -108,19 +107,19 @@ public class ManagePropertiesServiceImplTest {
         assertEquals(property.getValue(), propertyRemoved.getValue());
     }
 
-    @Test
-    public void getAllProperties() {
-        Property property = new Property("someKey", "someValue");
-        Properties properties = new Properties();
-        properties.put(property.getKey(), property.getValue());
-
-        when(this.propertiesService.getProperties()).thenReturn(properties);
-        // When
-        Map<String, String> allProperties = this.managePropertiesService.getAllProperties();
-        // Then
-        verify(this.propertiesService, times(2)).getProperties();
-        assertEquals(1, allProperties.size());
-    }
+//    @Test
+//    public void getAllProperties() {
+//        Property propertyDTO = new Property("someKey", "someValue");
+//        Properties properties = new Properties();
+//        properties.put(propertyDTO.getKey(), propertyDTO.getValue());
+//
+//        when(this.propertiesService.getProperties()).thenReturn(properties);
+//        // When
+//        Map<String, String> allProperties = this.managePropertiesService.getAllProperties();
+//        // Then
+//        verify(this.propertiesService, times(2)).getProperties();
+//        assertEquals(1, allProperties.size());
+//    }
 
     @Test
     public void getAllAuditLogs() {

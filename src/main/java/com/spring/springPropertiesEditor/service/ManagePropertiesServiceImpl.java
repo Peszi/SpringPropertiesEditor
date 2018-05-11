@@ -49,11 +49,11 @@ public class ManagePropertiesServiceImpl implements ManagePropertiesService {
     }
 
     @Override
-    public Map<String, String> getAllProperties() {
-        Map<String, String> propertiesMap = new HashMap<>();
+    public List<Property> getAllProperties() {
+        List<Property> propertiesList = new ArrayList<>();
         for (String key : new TreeSet<>(this.propertiesService.getProperties().stringPropertyNames()).descendingSet())
-            propertiesMap.put(key, this.propertiesService.getProperties().getProperty(key));
-        return propertiesMap;
+            propertiesList.add(new Property(key, this.propertiesService.getProperties().getProperty(key)));
+        return propertiesList;
     }
 
     @Override

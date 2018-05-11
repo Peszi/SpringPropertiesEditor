@@ -3,14 +3,13 @@ package com.spring.springPropertiesEditor.restcontroller;
 import com.spring.springPropertiesEditor.exception.BadRequestException;
 import com.spring.springPropertiesEditor.model.Property;
 import com.spring.springPropertiesEditor.service.ManagePropertiesService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/properties")
 public class PropertiesRestController {

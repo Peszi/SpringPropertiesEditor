@@ -1,8 +1,7 @@
 package com.spring.springPropertiesEditor.controller;
 
-import com.spring.springPropertiesEditor.service.ManagePropertiesService;
-import com.spring.springPropertiesEditor.service.ManagePropertiesServiceImpl;
 import com.spring.springPropertiesEditor.model.Property;
+import com.spring.springPropertiesEditor.service.ManagePropertiesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Map;
-import java.util.TreeMap;
 
 @Slf4j
 @Controller

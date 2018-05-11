@@ -1,11 +1,8 @@
 package com.spring.springPropertiesEditor.service;
 
 import com.spring.springPropertiesEditor.model.Property;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
@@ -16,17 +13,16 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.booleanThat;
 import static org.mockito.Mockito.verify;
 
 public class PropertiesServiceImplTest {
 
-    private static final Property SOME_PROPERTY_A = new Property("some.keyA", "some.valueA");
-    private static final Property SOME_PROPERTY_B = new Property("some.keyB", "some.valueB");
-    private static final Property SOME_PROPERTY_C = new Property("some.keyC", "some.valueC");
+    private static final Property SOME_PROPERTY_DTOA = new Property("some.keyA", "some.valueA");
+    private static final Property SOME_PROPERTY_DTOB = new Property("some.keyB", "some.valueB");
+    private static final Property SOME_PROPERTY_DTOC = new Property("some.keyC", "some.valueC");
 
-    private static final String SOME_PROPERTIES = SOME_PROPERTY_A.getKey() + "=" + SOME_PROPERTY_A.getValue() + "\n" +
-                                                    SOME_PROPERTY_B.getKey() + "=" + SOME_PROPERTY_B.getValue();
+    private static final String SOME_PROPERTIES = SOME_PROPERTY_DTOA.getKey() + "=" + SOME_PROPERTY_DTOA.getValue() + "\n" +
+                                                    SOME_PROPERTY_DTOB.getKey() + "=" + SOME_PROPERTY_DTOB.getValue();
 
     @InjectMocks
     Properties properties;
@@ -54,12 +50,12 @@ public class PropertiesServiceImplTest {
     public void addProperty() {
         // Given
         this.propertiesService.loadProperties(new ByteArrayInputStream(SOME_PROPERTIES.getBytes()));
-        this.propertiesService.addProperty(SOME_PROPERTY_C);
+        this.propertiesService.addProperty(SOME_PROPERTY_DTOC);
         // When
-        String resultValue = this.propertiesService.getProperties().getProperty(SOME_PROPERTY_C.getKey());
+        String resultValue = this.propertiesService.getProperties().getProperty(SOME_PROPERTY_DTOC.getKey());
         // Then
         assertEquals(3, this.propertiesService.getProperties().size());
-        assertEquals(SOME_PROPERTY_C.getValue(), resultValue);
+        assertEquals(SOME_PROPERTY_DTOC.getValue(), resultValue);
     }
 
     @Test
@@ -67,9 +63,9 @@ public class PropertiesServiceImplTest {
         final String NEW_VALUE = "newValue";
         // Given
         this.propertiesService.loadProperties(new ByteArrayInputStream(SOME_PROPERTIES.getBytes()));
-        this.propertiesService.editProperty(new Property(SOME_PROPERTY_A.getKey(), NEW_VALUE));
+        this.propertiesService.editProperty(new Property(SOME_PROPERTY_DTOA.getKey(), NEW_VALUE));
         // When
-        String resultValue = this.propertiesService.getProperties().getProperty(SOME_PROPERTY_A.getKey());
+        String resultValue = this.propertiesService.getProperties().getProperty(SOME_PROPERTY_DTOA.getKey());
         // Then
         assertEquals(2, this.propertiesService.getProperties().size());
         assertEquals(NEW_VALUE, resultValue);
@@ -79,9 +75,9 @@ public class PropertiesServiceImplTest {
     public void removeProperty() {
         // Given
         this.propertiesService.loadProperties(new ByteArrayInputStream(SOME_PROPERTIES.getBytes()));
-        this.propertiesService.removeProperty(SOME_PROPERTY_A);
+        this.propertiesService.removeProperty(SOME_PROPERTY_DTOA);
         // When
-        String resultValue = this.propertiesService.getProperties().getProperty(SOME_PROPERTY_A.getKey());
+        String resultValue = this.propertiesService.getProperties().getProperty(SOME_PROPERTY_DTOA.getKey());
         // Then
         assertEquals(1, this.propertiesService.getProperties().size());
         assertNull(resultValue);
@@ -92,7 +88,7 @@ public class PropertiesServiceImplTest {
         // Given
         this.propertiesService.loadProperties(new ByteArrayInputStream(SOME_PROPERTIES.getBytes()));
         // When
-        boolean result = this.propertiesService.hasKey(SOME_PROPERTY_A.getKey());
+        boolean result = this.propertiesService.hasKey(SOME_PROPERTY_DTOA.getKey());
         // Then
         assertTrue(result);
     }
@@ -103,7 +99,7 @@ public class PropertiesServiceImplTest {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(SOME_PROPERTIES.getBytes());
         this.propertiesService.loadProperties(inputStream);
         // When
-        propertiesService.addProperty(SOME_PROPERTY_C);
+        propertiesService.addProperty(SOME_PROPERTY_DTOC);
         // Then
         assertEquals(3, this.propertiesService.getProperties().size());
     }
@@ -117,7 +113,7 @@ public class PropertiesServiceImplTest {
         boolean result = this.propertiesService.saveProperties(outputStream);
         // Then
         assertTrue(result);
-        assertThat(new String(outputStream.toByteArray()), containsString(SOME_PROPERTY_A.getKey() + "=" + SOME_PROPERTY_A.getValue()));
-        assertThat(new String(outputStream.toByteArray()), containsString(SOME_PROPERTY_B.getKey() + "=" + SOME_PROPERTY_B.getValue()));
+        assertThat(new String(outputStream.toByteArray()), containsString(SOME_PROPERTY_DTOA.getKey() + "=" + SOME_PROPERTY_DTOA.getValue()));
+        assertThat(new String(outputStream.toByteArray()), containsString(SOME_PROPERTY_DTOB.getKey() + "=" + SOME_PROPERTY_DTOB.getValue()));
     }
 }
