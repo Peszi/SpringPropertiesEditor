@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Scope;
 
 import java.util.Properties;
 
-@Slf4j
 @Configuration
 public class BasicConfiguration {
 

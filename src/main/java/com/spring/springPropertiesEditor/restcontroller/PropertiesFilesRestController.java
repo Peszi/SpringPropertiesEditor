@@ -1,41 +1,36 @@
 package com.spring.springPropertiesEditor.restcontroller;
 
-import com.spring.springPropertiesEditor.exception.BadRequestException;
+import com.spring.springPropertiesEditor.service.ManagePropertiesService;
 import com.spring.springPropertiesEditor.service.PropertiesFilesService;
 import com.spring.springPropertiesEditor.util.FileType;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/properties")
 public class PropertiesFilesRestController {
 
     private PropertiesFilesService fileService;
+    private ManagePropertiesService manageService;
 
-    public PropertiesFilesRestController(PropertiesFilesService fileService) {
+    public PropertiesFilesRestController(PropertiesFilesService fileService, ManagePropertiesService manageService) {
         this.fileService = fileService;
+        this.manageService = manageService;
     }
 
+    @CrossOrigin
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity uploadFile(@RequestParam MultipartFile file) throws IOException {
         this.fileService.loadPropertiesFile(file);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(this.manageService.getAllProperties());
     }
 
-    @GetMapping("/download")
+    @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity getPropertiesFile() throws FileNotFoundException {
         return this.setupResponse(FileType.PROPERTIES);
     }

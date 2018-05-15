@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin
 @RestController
 @RequestMapping("/api/properties")
 public class PropertiesRestController {
@@ -24,7 +24,7 @@ public class PropertiesRestController {
     public ResponseEntity changeOrAddProperty(@Valid @ModelAttribute Property property, BindingResult binding) {
         if (!binding.hasErrors()) {
             this.managePropertiesService.addOrChangeProperty(property);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(this.managePropertiesService.getAllProperties());
         }
         throw new BadRequestException("Incorrect property!");
     }
@@ -33,7 +33,7 @@ public class PropertiesRestController {
     public ResponseEntity removeProperty(@Valid @ModelAttribute Property property, BindingResult binding) {
         if (!binding.hasErrors()) {
             this.managePropertiesService.removeProperty(property);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(this.managePropertiesService.getAllProperties());
         }
         throw new BadRequestException("Incorrect property!");
     }

@@ -42,7 +42,7 @@ public class PropertiesFilesRestControllerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.filesController = new PropertiesFilesRestController(filesService);
+//        this.filesController = new PropertiesFilesRestController(filesService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(this.filesController)
                 .setControllerAdvice(new RestAdviceController())
                 .build();

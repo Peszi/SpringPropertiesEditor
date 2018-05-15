@@ -8,10 +8,11 @@ import org.springframework.context.annotation.PropertySource;
 import java.util.ArrayList;
 import java.util.List;
 
-@Configuration
-@RefreshScope
-@PropertySource("classpath:/users.properties")
-@ConfigurationProperties(prefix = "user")
+//@Configuration
+//@RefreshScope
+//@PropertySource("classpath:/users.properties")
+//@ConfigurationProperties(prefix = "user")
+@Deprecated
 public class UsersProperties {
 
     private List<User> users = new ArrayList<>();
